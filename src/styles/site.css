@@ -243,6 +243,60 @@ body[data-ds-dark-theme] {
   display: block;
 }
 
+/* Pause control for the ambient animation (WCAG 2.2.2). Small and quiet, but
+   always in the tab order and visible on focus. */
+.field__toggle {
+  position: absolute;
+  inset-block-start: 0.75rem;
+  inset-inline-end: 0.75rem;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  inline-size: 2rem;
+  block-size: 2rem;
+  padding: 0;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 999px;
+  corner-shape: round;
+  background: var(--dsw-alias-bg-base);
+  color: var(--dsw-alias-label-secondary);
+  cursor: pointer;
+  opacity: 0.45;
+  transition:
+    opacity var(--dur) var(--ease),
+    color var(--dur) var(--ease);
+}
+
+.field__toggle:hover,
+.field__toggle:focus-visible {
+  opacity: 1;
+  color: var(--dsw-alias-label-primary);
+}
+
+.field__icon {
+  inline-size: 0.75rem;
+  block-size: 0.75rem;
+  fill: currentColor;
+}
+
+.field__icon--play {
+  display: none;
+}
+
+.field[data-field-paused] .field__icon--pause {
+  display: none;
+}
+
+.field[data-field-paused] .field__icon--play {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field__toggle {
+    display: none;
+  }
+}
+
 .accent {
   background: linear-gradient(
     100deg,

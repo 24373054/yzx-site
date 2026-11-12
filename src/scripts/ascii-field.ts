@@ -218,6 +218,9 @@ export const mountAsciiField = (
   let raf = 0
   let running = false
   let onScreen = true
+  // Time is accumulated across pauses so resuming never makes the field jump.
+  let elapsed = 0
+  let userPaused = false
   let hostRendered = true
   let lastDraw = 0
   let startedAt = 0
@@ -315,11 +318,12 @@ export const mountAsciiField = (
     raf = requestAnimationFrame(tick)
     if (now - lastDraw < FRAME_MS) return
     lastDraw = now
-    draw(STATIC_TIME + (now - startedAt) / 1000)
+    draw(STATIC_TIME + elapsed + (now - startedAt) / 1000)
   }
 
   const sync = () => {
-    const shouldRun = onScreen && hostRendered && !document.hidden && !reducedMotion.matches
+    const shouldRun =
+      onScreen && hostRendered && !document.hidden && !reducedMotion.matches && !userPaused
     if (shouldRun && !running) {
       running = true
       startedAt = performance.now()
@@ -327,9 +331,23 @@ export const mountAsciiField = (
       raf = requestAnimationFrame(tick)
     } else if (!shouldRun && running) {
       running = false
+      elapsed += (performance.now() - startedAt) / 1000
       cancelAnimationFrame(raf)
     }
   }
+
+  // WCAG 2.2.2: an ambient animation that runs next to other content needs a
+  // visible way to stop it. The button only toggles the loop; the current frame
+  // stays painted, so pausing never blanks the artwork.
+  const toggle = host.querySelector<HTMLButtonElement>('[data-field-toggle]')
+  const setPaused = (paused: boolean) => {
+    userPaused = paused
+    host.toggleAttribute('data-field-paused', paused)
+    toggle?.setAttribute('aria-label', paused ? '播放动画' : '暂停动画')
+    sync()
+  }
+  const onToggle = () => setPaused(!userPaused)
+  toggle?.addEventListener('click', onToggle)
 
   const observer = new IntersectionObserver(
     (entries) => {
@@ -397,6 +415,7 @@ export const mountAsciiField = (
     host.removeEventListener('contentvisibilityautostatechange', onContentVisibility)
     host.removeEventListener('pointermove', onPointer)
     host.removeEventListener('pointerleave', clearPointer)
+    toggle?.removeEventListener('click', onToggle)
     cancelAnimationFrame(raf)
   }
 }

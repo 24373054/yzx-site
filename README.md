@@ -124,6 +124,7 @@ draft: false   # 可选，true 时不上线
 - **风场**：几组正弦叠加出转向；另一条横穿的密度沙丘带把 `dune` 阈值化，得到成片的"草场"与空隙；一团漂移光池只抬色调、不改密度。指针靠近处风向往上/下偏、色调变亮。
 - **配色**：每格从 `--field-tone-1/2/3` 三段色带按 tone 取值，因此明暗两套只需换 CSS 变量（`src/styles/site.css` 的 `:root` 与 `body[data-ds-dark-theme]`）；胶片颗粒用 `--field-grain`。
 - **生命周期**：`IntersectionObserver` 离开视口、`contentvisibilityautostatechange` 被跳过、标签页隐藏、`prefers-reduced-motion: reduce`，任一成立就停 rAF；`ResizeObserver` 重建网格；body 的 `data-ds-dark-theme` 变化时重建调色板。
+- **暂停**：面板右上角的按钮（`[data-field-toggle]`）冻结风场并原地保留当前帧，再点恢复——暂停期间累计的时间会在恢复时补上，不会跳帧。按钮随状态切换 `aria-label`（暂停动画 / 播放动画），不设 `aria-pressed`；`prefers-reduced-motion: reduce` 下整个按钮隐藏（此时画面本来就是静的）。
 - 帧率 30 fps（`FRAME_MS = 33`），单帧上限 14,000 格，DPR 上限 2。
 
 **静帧回退**：`STATIC_TIME = 11.5` 是画布初始化时画的那一帧，静态图也由同一时刻生成，所以静图切到动画不会跳帧。静图通过 CSS 变量 `--field-still` 引用，只在 `prefers-reduced-motion: reduce` 或 `<noscript>` 时才真正发起请求 —— 正常访客完全不下载这一百多 KB。
@@ -161,8 +162,8 @@ node tools/field-shot.mjs               # 只截面板，用于快速迭代
 - `pnpm check` 应为 0 errors（当前 8 条 hint 是 ASTRO 内部 API 的 deprecated 提示之外的噪声，可忽略）。
 - 构建后检查体积：`du -b dist/_astro/*.js dist/_astro/*.css`。
 - 视觉回归：`tools/shots.mjs`（Playwright 驱动本机 Chrome，输出明暗 + 移动端截图到 `.shots/`），`tools/crop.py` 裁剪局部大图，`tools/preview_images.py` 把最终截图压成 `docs/preview/*.jpg`。
-- 行为回归：`tools/theme-check.mjs`（系统/浅色/深色切换与持久化）、`tools/nojs-check.mjs`（禁用 JS 时应固定浅色画布）。
-- Lighthouse 13.6，移动端模拟 + `pnpm preview` + 本机 Chrome：首页 100/100/100/100，FCP 0.9 s、LCP 0.9 s、TBT 30 ms、CLS 0、传输 18 KiB；文章页 100/100/100/100，传输 18 KiB。桌面端两页同样四项 100，LCP 0.3 s。
+- 行为回归：`tools/theme-check.mjs`（系统/浅色/深色切换与持久化）、`tools/nojs-check.mjs`（禁用 JS 时应固定浅色画布）、`tools/field-pause-check.mjs`（点暂停后画面冻结、`aria-label` 切换、无 `aria-pressed`）。
+- Lighthouse 13.6，移动端模拟 + `pnpm preview` + 本机 Chrome：首页 100/100/100/100，FCP 0.9–1.0 s、LCP 0.9–1.1 s、TBT 0–70 ms、CLS 0、传输 18–19 KiB；文章页 100/100/100/100，传输 18 KiB。桌面端两页同样四项 100，LCP 0.3 s。
 - 社交分享图：`tools/make_og.py` 用 Pillow 生成 `public/og.png`（1200×630），配色与站点一致；改品牌信息后重跑一次。
 
 ## 已知取舍

@@ -17,6 +17,15 @@ const posts = (await getCollection('writing', ({ data }) => !data.draft))
     <div class="field" data-ascii-field>
       <div class="field__still" aria-hidden="true"></div>
       <canvas class="field__canvas" aria-hidden="true"></canvas>
+      <button class="field__toggle" type="button" data-field-toggle aria-label="暂停动画">
+        <svg class="field__icon field__icon--pause" viewBox="0 0 16 16" aria-hidden="true">
+          <rect x="4" y="3" width="3" height="10" rx="1"></rect>
+          <rect x="9" y="3" width="3" height="10" rx="1"></rect>
+        </svg>
+        <svg class="field__icon field__icon--play" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M5 2.9a.9.9 0 0 1 1.36-.77l8 5.1a.9.9 0 0 1 0 1.54l-8 5.1A.9.9 0 0 1 5 13.1Z"></path>
+        </svg>
+      </button>
     </div>
   </section>
 
