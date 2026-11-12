@@ -11,10 +11,11 @@ os.makedirs("docs/preview", exist_ok=True)
 PICKS = [
     ("01-home-light.png", "home-light", 1400),
     ("02-home-dark.png", "home-dark", 1400),
-    ("05-post-light.png", "article-light", 1400),
-    ("21-fold-dark.png", "fold-dark", 1400),
-    ("22-fold-mobile-light.png", "mobile-light", 520),
-    ("10-post-mobile.png", "article-mobile", 520),
+    ("03-404-light.png", "404-light", 1400),
+    ("04-home-mobile.png", "mobile-light", 520),
+    ("05-home-mobile-dark.png", "mobile-dark", 520),
+    ("10-fold-light.png", "fold-light", 1400),
+    ("11-fold-dark.png", "fold-dark", 1400),
 ]
 
 for source, target, max_width in PICKS:

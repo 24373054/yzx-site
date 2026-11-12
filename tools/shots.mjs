@@ -23,7 +23,7 @@ async function pageFor(scheme, width, height, motion) {
   return { context, page }
 }
 
-/** Static (motion reduced) full-page captures — every reveal state is resolved. */
+/** Static (motion reduced) full-page captures — the still frame is shown. */
 async function capture(name, path, { scheme = 'light', width = 1440, height = 1000 } = {}) {
   const { context, page } = await pageFor(scheme, width, height, 'reduce')
   const errors = []
@@ -38,11 +38,13 @@ async function capture(name, path, { scheme = 'light', width = 1440, height = 10
       .filter((el) => el.getBoundingClientRect().right > root.clientWidth + 1)
       .slice(0, 5)
       .map((el) => `${el.tagName.toLowerCase()}.${el.className?.toString().slice(0, 40)}`)
+    const stage = document.querySelector('.stage')
     return {
       overflowX: root.scrollWidth - root.clientWidth,
       overflowing,
       height: root.scrollHeight,
       canvas: getComputedStyle(root).backgroundColor,
+      stage: stage ? [stage.getBoundingClientRect().width, stage.getBoundingClientRect().height] : null,
     }
   })
   report.push({ name, errors, ...state })
@@ -51,22 +53,16 @@ async function capture(name, path, { scheme = 'light', width = 1440, height = 10
 
 await capture('01-home-light', '/')
 await capture('02-home-dark', '/', { scheme: 'dark' })
-await capture('03-work-light', '/work')
-await capture('04-writing-light', '/writing')
-await capture('05-post-light', '/writing/static-first')
-await capture('06-post-dark', '/writing/tokens-not-variables', { scheme: 'dark' })
-await capture('07-about-light', '/about')
-await capture('08-404-light', '/does-not-exist')
-await capture('09-home-mobile', '/', { width: 390, height: 844 })
-await capture('10-post-mobile', '/writing/building-with-tokens', { width: 390, height: 844 })
-await capture('11-work-mobile', '/work', { width: 390, height: 844, scheme: 'dark' })
+await capture('03-404-light', '/does-not-exist')
+await capture('04-home-mobile', '/', { width: 390, height: 844 })
+await capture('05-home-mobile-dark', '/', { width: 390, height: 844, scheme: 'dark' })
 
 /** Above-the-fold frames with motion enabled — how a visitor actually lands. */
 for (const [name, scheme, width, height] of [
-  ['20-fold-light', 'light', 1440, 900],
-  ['21-fold-dark', 'dark', 1440, 900],
-  ['22-fold-mobile-light', 'light', 390, 844],
-  ['23-fold-mobile-dark', 'dark', 390, 844],
+  ['10-fold-light', 'light', 1440, 900],
+  ['11-fold-dark', 'dark', 1440, 900],
+  ['12-fold-mobile-light', 'light', 390, 844],
+  ['13-fold-mobile-dark', 'dark', 390, 844],
 ]) {
   const { context, page } = await pageFor(scheme, width, height, 'no-preference')
   await page.goto(BASE + '/', { waitUntil: 'networkidle' })

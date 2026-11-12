@@ -1,46 +1,24 @@
 ---
 import Base from '../layouts/Base.astro'
-import WorkRow from '../components/WorkRow.astro'
-import PostRow from '../components/PostRow.astro'
 import { site } from '../config'
-import { featuredProjects } from '../data/projects'
-import { getCollection } from 'astro:content'
-
-const posts = (await getCollection('writing', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 3)
 ---
 
 <Base>
-  <section class="shell hero">
-    <h1 class="visually-hidden">{site.title} — {site.role}</h1>
-    <div class="field" data-ascii-field>
-      <div class="field__still" aria-hidden="true"></div>
-      <canvas class="field__canvas" aria-hidden="true"></canvas>
-      <button class="field__toggle" type="button" data-field-toggle aria-label="暂停动画">
-        <svg class="field__icon field__icon--pause" viewBox="0 0 16 16" aria-hidden="true">
-          <rect x="4" y="3" width="3" height="10" rx="1"></rect>
-          <rect x="9" y="3" width="3" height="10" rx="1"></rect>
-        </svg>
-        <svg class="field__icon field__icon--play" viewBox="0 0 16 16" aria-hidden="true">
-          <path d="M5 2.9a.9.9 0 0 1 1.36-.77l8 5.1a.9.9 0 0 1 0 1.54l-8 5.1A.9.9 0 0 1 5 13.1Z"></path>
-        </svg>
-      </button>
-    </div>
-  </section>
+  <h1 class="visually-hidden">{site.title}</h1>
 
-  <section class="shell section">
-    <h2 class="visually-hidden">作品</h2>
-    <ul class="rows">
-      {featuredProjects.map((project) => <WorkRow project={project} />)}
-    </ul>
-  </section>
-
-  <section class="shell section">
-    <h2 class="visually-hidden">文章</h2>
-    <ul class="rows">
-      {posts.map((post) => <PostRow post={post} />)}
-    </ul>
+  <!--
+    The whole first screen is one generative artwork. It sits in the page, not
+    in a card: the strokes fade out at every edge, the header floats on top of
+    it, and the field runs from the very top of the viewport down into the page
+    background. The layers below exist so the art is never a white rectangle for
+    a moment: a blurred echo of the same frame (a 1 KB data URI) shows instantly,
+    the live canvas fades in over it, and the sharp still only appears for
+    reduced-motion or no-JS visitors.
+  -->
+  <section class="stage" data-ascii-field>
+    <div class="stage__echo" aria-hidden="true"></div>
+    <div class="stage__still" aria-hidden="true"></div>
+    <canvas class="stage__canvas" aria-hidden="true"></canvas>
   </section>
 </Base>
 
@@ -49,5 +27,9 @@ const posts = (await getCollection('writing', ({ data }) => !data.draft))
 
   const host = document.querySelector<HTMLElement>('[data-ascii-field]')
   const canvas = host?.querySelector<HTMLCanvasElement>('canvas')
-  if (host && canvas) mountAsciiField(host, canvas)
+  if (host && canvas) mountAsciiField(host, canvas, {
+    // Rendering the fallback still: paint exactly the frame the animation starts
+    // on, so the image swap is invisible.
+    frozen: new URLSearchParams(location.search).has('still'),
+  })
 </script>

@@ -20,10 +20,9 @@ const {
 } = Astro.props
 
 const base = Astro.site ?? new URL('https://yzx.example.com')
-const pageTitle = title ? `${title} — ${site.title}` : `${site.title} · ${site.role}`
+const pageTitle = title ? `${title} — ${site.title}` : site.title
 const canonical = new URL(Astro.url.pathname, base).href
 const ogImage = new URL('/og.png', base).href
-const feedUrl = new URL('/rss.xml', base).href
 ---
 
 <!doctype html>
@@ -36,14 +35,13 @@ const feedUrl = new URL('/rss.xml', base).href
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="alternate" type="application/rss+xml" title={`${site.title} · 文章`} href={feedUrl} />
     <meta name="color-scheme" content="light dark" />
-    <!-- Without scripts the hero art has to be the still image; the media query
-         in site.css covers reduced motion, this covers "no JS at all". The
-         stylesheet is injected after this block, hence !important. -->
+    <!-- Without scripts the art has to be the still frame; site.css covers
+         reduced motion, this covers "no JS at all". The stylesheet resolves
+         after this block, hence !important. -->
     <noscript>
       <style>
-        .field__still {
+        .stage__still {
           background-image: var(--field-still);
           opacity: 1 !important;
         }

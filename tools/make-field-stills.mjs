@@ -26,14 +26,14 @@ for (const theme of ['light', 'dark']) {
     theme,
   )
   const page = await context.newPage()
-  await page.goto(url, { waitUntil: 'domcontentloaded' })
+  await page.goto(url + '?still', { waitUntil: 'domcontentloaded' })
   await page.waitForFunction(
-    () => document.querySelector('.field')?.classList.contains('is-live'),
+    () => document.querySelector('.stage')?.classList.contains('is-live'),
     null,
     { timeout: 20000 },
   )
   const capture = await page.evaluate(() => {
-    const canvas = document.querySelector('.field__canvas')
+    const canvas = document.querySelector('.stage__canvas')
     return canvas instanceof HTMLCanvasElement
       ? { data: canvas.toDataURL('image/png'), width: canvas.width, height: canvas.height }
       : null

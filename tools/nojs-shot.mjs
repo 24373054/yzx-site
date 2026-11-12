@@ -5,7 +5,7 @@ const page = await ctx.newPage()
 await page.goto('http://127.0.0.1:4321/', { waitUntil: 'load' })
 await page.waitForTimeout(1200)
 const info = await page.evaluate(() => {
-  const still = document.querySelector('.field__still')
+  const still = document.querySelector('.stage__still')
   const cs = getComputedStyle(still)
   return { opacity: cs.opacity, bg: cs.backgroundImage.slice(0, 60), w: still.getBoundingClientRect().width }
 }).catch(e => String(e))

@@ -7,7 +7,7 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
 const errors = []
 page.on('pageerror', (error) => errors.push(String(error)))
 await page.goto('http://127.0.0.1:4321/', { waitUntil: 'networkidle' })
-await page.waitForSelector('.field.is-live')
+await page.waitForSelector('.stage.is-live')
 
 const host = page.locator('[data-ascii-field]')
 const btn = page.locator('[data-field-toggle]')
@@ -24,7 +24,7 @@ const read = () =>
 
 const frame = () =>
   page.evaluate(() => {
-    const canvas = document.querySelector('.field__canvas')
+    const canvas = document.querySelector('.stage__canvas')
     const ctx = canvas.getContext('2d')
     const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data
     let sum = 0
