@@ -1,0 +1,87 @@
+---
+title: 用 DSH 设计令牌搭一个零框架个人站
+description: 这个站点本身是怎么搭的：Astro 7 负责构建，DSH 的设计令牌负责视觉，主题运行时只有四十行 DOM 操作，剩下的交给 CSS。
+date: 2026-11-10
+tags: ['Astro', '设计系统', '性能']
+---
+
+这个站点没有用 Tailwind，没有用组件库，没有用 React。视觉层来自一套为应用界面准备的设计令牌，交互只有主题切换，其余全部是 CSS。
+
+这篇记录具体怎么做的，包括哪些地方顺、哪些地方别扭。
+
+## 栈只有四层
+
+```text
+Astro 7           构建、路由、内容集合、MDX
+DSH tokens        颜色 / 字阶 / 阴影 / 圆角 / 动效（纯 CSS）
+DSH theme         主题运行时 + DOM 投影（纯 TS，零依赖）
+site.css          显示级字阶、页面编排、art layer
+```
+
+令牌和主题运行时是从 `dsh-ui-kit` 里 vendor 出来的源码，不是 npm 依赖。原因很实际：发布到 npm 的 `@dsh-ui/tokens` 包里没有构建产物，`main` 指向的 `dist/index.js` 不存在；`@dsh-ui/theme` 和 `@dsh-ui/core` 根本没有发布。与其等上游修，不如把需要的几个文件拷进仓库——MIT 协议，六百行左右，可控。
+
+vendor 的代价是升级要手动 diff。对一个改动频率低的视觉层来说，这笔账划算。
+
+## 令牌给了什么，没给什么
+
+**给了**：完整的明暗两套色板、语义别名、阴影层级、动效曲线、以及一套 `corner-shape: superellipse(1.5)` 的圆角处理——支持的浏览器里，所有圆角都是超椭圆，比圆弧更接近现代硬件界面的观感。
+
+**没给**：显示级排版。令牌的字号阶梯到 24px 为止，因为它的服务对象是 12–17px 的应用界面。所以这个站自己补了一层：
+
+```css
+:root {
+  --display-1: clamp(2.875rem, 8.4vw, 6.5rem);
+  --tracking-display: -0.035em;
+}
+
+.display {
+  font-size: var(--display-1);
+  line-height: 0.96;
+  letter-spacing: var(--tracking-display);
+}
+```
+
+这是预期的分工：**令牌管不变量，站点层管表达**。把营销页的字号硬塞进应用令牌表，只会让两边都难受。
+
+## 主题切换只有四十行
+
+首帧不能闪，所以拆成两段：
+
+1. `<head>` 里的内联脚本解析 `localStorage`，设置 `color-scheme` 和 `data-ds-theme-source`，让画布在第一次绘制时就是对的。
+2. `<body>` 开头的内联脚本设置调色板属性，保证第一块内容出现之前明暗已经定好。
+
+之后由 `ThemeRuntime` 接管：它持有 `prefers-color-scheme` 的监听，只在 `system` 模式下重新发布快照；`presentTheme` 把快照投影到 `documentElement` 和 `body`。整段逻辑不到四十行，没有任何框架参与。
+
+关键设计是**读写分离**：运行时不知道 DOM 存在，presenter 不判断主题。所以主题逻辑可以单独测试，也可以在别的渲染目标里复用。
+
+## Art layer 全是 CSS
+
+「有设计感」不等于「有 JavaScript」。这个站的视觉层次来自四样东西：
+
+- 三个缓慢漂移的径向渐变色场（`body::before`，28 秒一循环）
+- 一层 SVG 噪点（`body::after`，`mix-blend-mode: overlay`，不透明度 3%）
+- 首屏的竖向细线网格，用 `mask-image` 在上下两端淡出
+- 滚动驱动的进入动画：`animation-timeline: view()`，不支持的浏览器直接显示静态内容
+
+```css
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+    }
+  }
+}
+```
+
+跨页面转场同理，`@view-transition { navigation: auto; }` 一行，返回按钮就能有方向感。全部零运行时。
+
+## 代价
+
+诚实地说，这套做法有三个不舒服的地方：
+
+- **没有组件生态**。每个控件都要自己写，包括它的 focus 态、hover 态、深色态。写三个页面之后会开始想要一个按钮组件。
+- **Astro 的 scoped CSS 是编译期作用域**，跨页面的共享样式只能放全局 CSS。这个站的做法是把所有站点级样式集中在一个 `site.css`，用命名约定约束，靠审阅而不是靠工具。
+- **内容集合的类型是构建期生成的**。改 frontmatter schema 之后，编辑器要等一次 dev server 重启才有新类型。
+
+这些代价换来的是：整站 JS 只有一个几 KB 的主题模块，没有水合，没有客户端路由，Lighthouse 四项接近满分。对个人站来说，这个交换是值得的。

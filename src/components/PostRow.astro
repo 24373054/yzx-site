@@ -1,0 +1,29 @@
+---
+import type { CollectionEntry } from 'astro:content'
+import { formatDate, readingTime } from '../lib/format'
+
+interface Props {
+  post: CollectionEntry<'writing'>
+}
+
+const { post } = Astro.props
+const minutes = readingTime(post.body)
+---
+
+<li>
+  <a class="row row--post" href={`/writing/${post.id}`}>
+    <time class="row__date" datetime={post.data.date.toISOString()}>
+      {formatDate(post.data.date)}
+    </time>
+    <div class="row__col">
+      <div class="row__head">
+        <h3 class="row__title">{post.data.title}</h3>
+      </div>
+      <p class="row__summary">{post.data.description}</p>
+    </div>
+    <ul class="chips row__tags">
+      {post.data.tags.slice(0, 2).map((tag) => <li class="chip">{tag}</li>)}
+      <li class="chip">{minutes} 分钟</li>
+    </ul>
+  </a>
+</li>

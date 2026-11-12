@@ -1,0 +1,19 @@
+# build output
+dist/
+.astro/
+
+# dependencies
+node_modules/
+.pnpm-store/
+
+# local tooling output
+.shots/
+docs/preview/*.tmp
+
+# vendored upstream clone (re-clone to diff, see README)
+refs/
+
+# editor / OS
+.DS_Store
+Thumbs.db
+*.log

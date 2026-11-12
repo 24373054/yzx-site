@@ -1,0 +1,20 @@
+/*
+ * Every global stylesheet of the DSH design system, in load order.
+ *
+ * Import this once from the application entry. It defines the `--dsw-*` token
+ * scale, the semantic aliases, typography roles, elevation, scrollbar skin, and
+ * the superellipse corner shape. Component sheets are CSS Modules and ship with
+ * their components; they only read `--dsw-alias-*` and never re-declare a
+ * palette.
+ *
+ * `design-platform.css` declares the palette on `body` and the dark overrides on
+ * `body[data-ds-dark-theme]`, so importing this file before the first paint is
+ * enough to theme the document. Use `@dsh-ui/theme` to flip the attribute.
+ */
+
+@import './styles/base.css';
+@import './styles/corner-shape.css';
+@import './styles/design-platform.css';
+@import './styles/scrollbar.css';
+@import './styles/gradient-shadow-text.css';
+@import './styles/shiki.css';

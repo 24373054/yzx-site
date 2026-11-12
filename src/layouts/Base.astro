@@ -1,0 +1,107 @@
+---
+import '../design/tokens/styles.css'
+import '../styles/site.css'
+import SiteHeader from '../components/SiteHeader.astro'
+import SiteFooter from '../components/SiteFooter.astro'
+import { site } from '../config'
+
+interface Props {
+  title?: string
+  description?: string
+  ogType?: 'website' | 'article'
+  noindex?: boolean
+}
+
+const {
+  title,
+  description = site.description,
+  ogType = 'website',
+  noindex = false,
+} = Astro.props
+
+const base = Astro.site ?? new URL('https://yzx.example.com')
+const pageTitle = title ? `${title} — ${site.title}` : `${site.title} · ${site.role}`
+const canonical = new URL(Astro.url.pathname, base).href
+const ogImage = new URL('/og.png', base).href
+const feedUrl = new URL('/rss.xml', base).href
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${site.title} · 文章`} href={feedUrl} />
+    <meta name="color-scheme" content="light dark" />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={site.title} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="zh_CN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    {/*
+      First-paint theme: resolve the stored preference before the body exists so
+      the document canvas is already the right colour. Kept inline on purpose —
+      it must run before any stylesheet resolves a media query.
+    */}
+    <script is:inline>
+      (() => {
+        try {
+          const raw = localStorage.getItem('site-theme')
+          const preference = (raw && JSON.parse(raw).preference) || 'system'
+          const systemDark = matchMedia('(prefers-color-scheme: dark)').matches
+          const dark = preference === 'dark' || (preference !== 'light' && systemDark)
+          const root = document.documentElement
+          root.dataset.dsThemeSource = preference === 'system' ? 'system' : dark ? 'dark' : 'light'
+          root.style.colorScheme = dark ? 'dark' : 'light'
+        } catch {
+          /* storage blocked — the CSS prefers-color-scheme fallback still works. */
+        }
+      })()
+    </script>
+  </head>
+
+  <body>
+    {/*
+      Palette attribute before the first content node paints. Mirrors the head
+      script; ThemeRuntime re-applies the same state once the bundle runs.
+    */}
+    <script is:inline>
+      (() => {
+        try {
+          const raw = localStorage.getItem('site-theme')
+          const preference = (raw && JSON.parse(raw).preference) || 'system'
+          const systemDark = matchMedia('(prefers-color-scheme: dark)').matches
+          const dark = preference === 'dark' || (preference !== 'light' && systemDark)
+          document.body.toggleAttribute('data-ds-dark-theme', dark)
+          document.body.style.setProperty('--dsh-content-font-size', '14px')
+        } catch {
+          /* no-op */
+        }
+      })()
+    </script>
+
+    <a class="skip" href="#main">跳到主要内容</a>
+    <SiteHeader />
+    <main id="main" class="site-main">
+      <slot />
+    </main>
+    <SiteFooter />
+
+    <script>
+      import '../scripts/theme'
+    </script>
+  </body>
+</html>

@@ -1,0 +1,92 @@
+---
+import Base from '../layouts/Base.astro'
+import WorkRow from '../components/WorkRow.astro'
+import PostRow from '../components/PostRow.astro'
+import { site } from '../config'
+import { featuredProjects } from '../data/projects'
+import { getCollection } from 'astro:content'
+
+const posts = (await getCollection('writing', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3)
+---
+
+<Base>
+  <section class="shell hero">
+    <p class="hero__availability">
+      <span class="hero__dot" aria-hidden="true"></span>
+      {site.availability}
+    </p>
+
+    <h1 class="display hero__title">
+      {
+        site.statement.map((line, index) => (
+          <span class={index === site.statement.length - 1 ? 'accent' : undefined}>{line}</span>
+        ))
+      }
+    </h1>
+
+    <p class="lede hero__lede">{site.lede}</p>
+
+    <div class="actions hero__actions">
+      <a class="btn btn--primary" href="/work">
+        查看作品
+        <span class="btn__arrow" aria-hidden="true">→</span>
+      </a>
+      <a class="btn btn--ghost" href="/writing">阅读文章</a>
+    </div>
+
+    <div class="hero__meta">
+      <span>{site.role}</span>
+      <span>{site.location}</span>
+      <span>Astro 7 · 零框架运行时</span>
+    </div>
+  </section>
+
+  <section class="shell section reveal">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">01 / WORK</p>
+        <h2 class="section-head__title">精选作品</h2>
+      </div>
+      <a class="section-head__link" href="/work">全部作品 →</a>
+    </div>
+
+    <ul class="rows">
+      {featuredProjects.map((project, index) => <WorkRow project={project} index={index} />)}
+    </ul>
+  </section>
+
+  <section class="shell section reveal">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">02 / WRITING</p>
+        <h2 class="section-head__title">最新文章</h2>
+      </div>
+      <a class="section-head__link" href="/writing">全部文章 →</a>
+    </div>
+
+    <ul class="rows">
+      {posts.map((post) => <PostRow post={post} />)}
+    </ul>
+  </section>
+
+  <section class="shell section reveal">
+    <div class="split">
+      <div class="stack">
+        <p class="eyebrow">03 / ABOUT</p>
+        <h2 class="display display--2">把界面<br />当成产品来做</h2>
+      </div>
+      <div class="prose">
+        <p>
+          我做的东西介于设计和工程之间：先想清楚信息怎么被读到，再决定用什么技术把它送出去。一个页面能静态生成，就不让它跑
+          JavaScript。
+        </p>
+        <p>
+          最近两年主要在设计系统、文档工具和 AI 工作台上花时间。喜欢把不变量沉淀成令牌和组件，把变化留在上层的组合里。
+        </p>
+        <p><a class="link" href="/about">关于我 →</a></p>
+      </div>
+    </div>
+  </section>
+</Base>

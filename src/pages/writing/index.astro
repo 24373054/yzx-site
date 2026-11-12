@@ -1,0 +1,27 @@
+---
+import Base from '../../layouts/Base.astro'
+import PostRow from '../../components/PostRow.astro'
+import { getCollection } from 'astro:content'
+
+const posts = (await getCollection('writing', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+---
+
+<Base
+  title="文章"
+  description="关于设计系统、静态架构与界面工程的笔记。"
+>
+  <section class="shell hero hero--compact">
+    <p class="eyebrow">WRITING / {posts.length} 篇</p>
+    <h1 class="display display--2 hero__title">文章</h1>
+    <p class="lede hero__lede">
+      写设计系统、静态架构和界面工程。不追热点，只记录做完之后仍然觉得对的部分。
+    </p>
+  </section>
+
+  <section class="shell section section--flush">
+    <ul class="rows">
+      {posts.map((post) => <PostRow post={post} />)}
+    </ul>
+  </section>
+</Base>
