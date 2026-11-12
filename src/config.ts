@@ -13,8 +13,11 @@ export const site = {
   /** Meta description only — never rendered on the page. */
   description: 'YZX 的个人网站。',
   socials: [{ label: 'GitHub', href: 'https://github.com/24373054' }],
-  /** Empty until the content pages return. */
-  nav: [] as ReadonlyArray<{ label: string; href: string }>,
+  /** Section navigation: the page is one document, so these are anchors. */
+  nav: [
+    { label: '\u4f5c\u54c1', href: '#work' },
+    { label: '\u8054\u7cfb', href: '#contact' },
+  ] as ReadonlyArray<{ label: string; href: string }>,
 } as const
 
 export type Site = typeof site

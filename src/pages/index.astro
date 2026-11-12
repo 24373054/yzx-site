@@ -1,25 +1,76 @@
 ---
 import Base from '../layouts/Base.astro'
 import { site } from '../config'
+
+/**
+ * The shell of the site: a full-bleed generative surface, then two editorial
+ * sections. There is no copy here — every section is a frame the real content
+ * will be poured into (works, a way to reach me), designed so the shapes read
+ * before a single word exists.
+ */
+const plates = [
+  { span: 1, density: 1.1 },
+  { span: 2, density: 1.7 },
+  { span: 3, density: 1.3 },
+  { span: 4, density: 2.0 },
+]
+
 ---
 
 <Base>
   <h1 class="visually-hidden">{site.title}</h1>
+  <div class="progress" aria-hidden="true"></div>
 
   <!--
-    The whole first screen is one generative artwork. It sits in the page, not
-    in a card: the strokes fade out at every edge, the header floats on top of
-    it, and the field runs from the very top of the viewport down into the page
-    background. The layers below exist so the art is never a white rectangle for
-    a moment: a blurred echo of the same frame (a 1 KB data URI) shows instantly,
-    the live canvas fades in over it, and the sharp still only appears for
-    reduced-motion or no-JS visitors.
+    The whole first screen is one generative artwork, not a card: the strokes
+    fade out at every edge and the header floats on top of it. The layers below
+    exist so the art is never a blank rectangle for a moment — a blurred echo of
+    the same frame (a 1 KB data URI) paints instantly, the live canvas fades in
+    over it, and the sharp still only appears for reduced-motion visitors.
   -->
-  <section class="stage" data-ascii-field>
+  <section class="stage" data-ascii-field aria-label="生成艺术：墨流">
     <div class="stage__echo" aria-hidden="true"></div>
     <div class="stage__still" aria-hidden="true"></div>
     <canvas class="stage__canvas" aria-hidden="true"></canvas>
   </section>
+
+  <div class="page">
+    <section class="sec" id="work" aria-labelledby="work-label">
+      <div class="sec__head">
+        <p class="sec__label" id="work-label"><span class="sec__num">01</span>作品</p>
+        <p class="sec__aside" aria-hidden="true">精选</p>
+      </div>
+      <ul class="plates">
+        {
+          plates.map((plate) => (
+            <li class={`plate plate--${plate.span}`}>
+              <span class="plate__wash" aria-hidden="true" />
+              <canvas
+                class="plate__art"
+                data-plate-art
+                data-seed={plate.span}
+                data-density={plate.density}
+                aria-hidden="true"
+              />
+              <span class="plate__num" aria-hidden="true">
+                {String(plate.span).padStart(2, '0')}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="sec" id="contact" aria-labelledby="contact-label">
+      <div class="sec__head">
+        <p class="sec__label" id="contact-label"><span class="sec__num">02</span>联系方式</p>
+      </div>
+      <a class="contact" href={site.socials[0].href} rel="me noopener" target="_blank">
+        <span class="contact__text">GitHub</span>
+        <span class="contact__arrow" aria-hidden="true">↗</span>
+      </a>
+    </section>
+  </div>
 </Base>
 
 <script>
@@ -27,9 +78,46 @@ import { site } from '../config'
 
   const host = document.querySelector<HTMLElement>('[data-ascii-field]')
   const canvas = host?.querySelector<HTMLCanvasElement>('canvas')
-  if (host && canvas) mountAsciiField(host, canvas, {
-    // Rendering the fallback still: paint exactly the frame the animation starts
-    // on, so the image swap is invisible.
-    frozen: new URLSearchParams(location.search).has('still'),
-  })
+  const still = new URLSearchParams(location.search).has('still')
+  if (host && canvas) {
+    const mountHero = () =>
+      mountAsciiField(host, canvas, {
+        // Rendering the fallback still: paint exactly the frame the animation
+        // starts on, so the image swap is invisible.
+        frozen: still,
+      })
+
+    mountHero()
+  }
+
+  // Work covers are single frozen frames of the same system: prints, not
+  // screenshots. They sit below the fold, so mount each one only as it comes
+  // near the viewport instead of warming four canvases before the first paint.
+  const plateCanvases = Array.from(
+    document.querySelectorAll<HTMLCanvasElement>('[data-plate-art]'),
+  )
+  const paintPlate = (plateCanvas: HTMLCanvasElement) => {
+    const index = plateCanvases.indexOf(plateCanvas)
+    mountAsciiField(plateCanvas, plateCanvas, {
+      frozen: true,
+      seed: Number(plateCanvas.dataset.seed) || index + 1,
+      density: Number(plateCanvas.dataset.density) || 3.4,
+    })
+  }
+
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue
+          paintPlate(entry.target as HTMLCanvasElement)
+          observer.unobserve(entry.target)
+        }
+      },
+      { rootMargin: '320px 0px' },
+    )
+    plateCanvases.forEach((plateCanvas) => observer.observe(plateCanvas))
+  } else {
+    plateCanvases.forEach(paintPlate)
+  }
 </script>

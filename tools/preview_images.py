@@ -1,30 +1,16 @@
-"""Convert the final captures into lightweight preview images for docs/."""
-
-from __future__ import annotations
-
+from PIL import Image
 import os
 
-from PIL import Image
-
-os.makedirs("docs/preview", exist_ok=True)
-
 PICKS = [
-    ("01-home-light.png", "home-light", 1400),
-    ("02-home-dark.png", "home-dark", 1400),
-    ("03-404-light.png", "404-light", 1400),
-    ("04-home-mobile.png", "mobile-light", 520),
-    ("05-home-mobile-dark.png", "mobile-dark", 520),
-    ("10-fold-light.png", "fold-light", 1400),
-    ("11-fold-dark.png", "fold-dark", 1400),
+    ('.shots/page-light.png', 'docs/preview/home-light.jpg', 1400),
+    ('.shots/page-dark.png', 'docs/preview/home-dark.jpg', 1400),
+    ('.shots/page-mobile.png', 'docs/preview/mobile-light.jpg', 520),
+    ('.shots/page-mobile-dark.png', 'docs/preview/mobile-dark.jpg', 520),
 ]
 
-for source, target, max_width in PICKS:
-    image = Image.open(f".shots/{source}").convert("RGB")
-    if image.width > max_width:
-        height = round(image.height * max_width / image.width)
-        image = image.resize((max_width, height), Image.LANCZOS)
-    if image.height > 4200:
-        image = image.crop((0, 0, image.width, 4200))
-    path = f"docs/preview/{target}.jpg"
-    image.save(path, quality=82, optimize=True, progressive=True)
-    print(path, image.size, os.path.getsize(path))
+os.makedirs('docs/preview', exist_ok=True)
+for src, dst, width in PICKS:
+    im = Image.open(src).convert('RGB')
+    height = round(im.height * width / im.width)
+    im.resize((width, height), Image.LANCZOS).save(dst, quality=82, optimize=True)
+    print(dst, im.size, '->', width, height)
