@@ -6,22 +6,19 @@ const year = new Date().getFullYear()
 
 <footer class="site-footer">
   <div class="shell">
-    <p class="eyebrow">CONTACT</p>
     <a class="site-footer__cta" href={`mailto:${site.email}`}>{site.email}</a>
 
     <div class="site-footer__row">
-      <p class="site-footer__note">© {year} {site.name} · {site.location}</p>
+      <p class="site-footer__note">© {year} {site.name}</p>
       <nav class="site-footer__links" aria-label="社交链接">
         {
           site.socials.map((item) => (
-            <a href={item.href} rel="me noopener" target={item.href.startsWith('http') ? '_blank' : undefined}>
+            <a href={item.href} rel="me noopener" target="_blank">
               {item.label}
             </a>
           ))
         }
       </nav>
     </div>
-
-    <p class="site-footer__colophon mono">{site.colophon}</p>
   </div>
 </footer>

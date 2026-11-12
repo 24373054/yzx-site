@@ -2,7 +2,7 @@
 import Base from '../../layouts/Base.astro'
 import { getCollection, render } from 'astro:content'
 import type { CollectionEntry } from 'astro:content'
-import { formatDate, readingTime } from '../../lib/format'
+import { formatDate } from '../../lib/format'
 
 export async function getStaticPaths() {
   const posts = await getCollection('writing', ({ data }) => !data.draft)
@@ -18,41 +18,19 @@ interface Props {
 
 const { post } = Astro.props as Props
 const { Content } = await render(post)
-const minutes = readingTime(post.body)
 ---
 
-<Base
-  title={post.data.title}
-  description={post.data.description}
-  ogType="article"
->
-  <article class="shell">
-    <header class="post-header">
-      <div class="post-header__meta">
-        <span class="eyebrow">
-          <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time>
-        </span>
-        <span class="eyebrow">{minutes} 分钟阅读</span>
-      </div>
-
-      <h1 class="post-header__title">{post.data.title}</h1>
-      <p class="post-header__desc">{post.data.description}</p>
-
-      {
-        post.data.tags.length > 0 && (
-          <ul class="chips post-header__tags">
-            {post.data.tags.map((tag) => <li class="chip">{tag}</li>)}
-          </ul>
-        )
-      }
+<Base title={post.data.title} description={post.data.description} ogType="article">
+  <article class="shell article">
+    <header class="article__head">
+      <time class="article__date" datetime={post.data.date.toISOString()}>
+        {formatDate(post.data.date)}
+      </time>
+      <h1 class="article__title">{post.data.title}</h1>
     </header>
 
     <div class="prose">
       <Content />
     </div>
-
-    <nav class="post-foot" aria-label="文章导航">
-      <a class="link" href="/writing">← 返回文章列表</a>
-    </nav>
   </article>
 </Base>

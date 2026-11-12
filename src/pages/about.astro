@@ -1,143 +1,30 @@
 ---
 import Base from '../layouts/Base.astro'
 import { site } from '../config'
-
-const stack = [
-  { label: '语言', items: ['TypeScript', 'CSS', 'Rust（读）', 'Python（脚本）'] },
-  { label: '框架', items: ['Astro', 'React', 'Node.js'] },
-  { label: '设计', items: ['设计令牌', 'CSS 变量', 'Figma', '可变字体'] },
-  { label: '基础设施', items: ['Cloudflare', 'Vercel', 'GitHub Actions'] },
-]
 ---
 
-<Base title="关于" description="关于 YZX：把界面当成产品做的独立开发者。">
-  <section class="shell hero hero--compact">
-    <p class="eyebrow">ABOUT</p>
-    <h1 class="display display--2 hero__title">关于我</h1>
-    <p class="lede hero__lede">
-      独立开发者、界面工程师。写了六年界面，越来越相信：好的界面是被删出来的，不是被堆出来的。
+<Base title="关于" description="YZX — 独立开发者，做网站与界面系统。">
+  <section class="shell page about">
+    <h1 class="visually-hidden">关于</h1>
+
+    <div class="about__body">
+      {site.about.map((line) => <p>{line}</p>)}
+    </div>
+
+    <p class="about__links">
+      <a class="link" href={`mailto:${site.email}`}>{site.email}</a>
+      {
+        site.socials.map((item) => (
+          <>
+            <span class="about__dot" aria-hidden="true">
+              ·
+            </span>
+            <a class="link" href={item.href} rel="me noopener" target="_blank">
+              {item.label}
+            </a>
+          </>
+        ))
+      }
     </p>
-  </section>
-
-  <section class="shell section reveal">
-    <div class="split">
-      <div class="stack">
-        <p class="eyebrow">01 / STORY</p>
-        <h2 class="section-head__title">我做什么</h2>
-      </div>
-      <div class="prose">
-        <p>
-          我是 {site.name}，目前以独立开发者的身份接项目。主要做三件事：设计系统从零到一、把重前端产品改造成静态优先、以及给团队补上「设计和工程之间那段没人负责的活」。
-        </p>
-        <p>
-          我喜欢待在细节里：行高差两个像素、深色模式下一块边框太亮、滚动到一半时标题的视觉重量不对。这些事单看都不重要，但它们加在一起就是「这个东西做得用不用心」。
-        </p>
-        <p>
-          技术判断上我偏保守。能用平台能力解决的，不引入库；能用一次构建解决的，不放到运行时；能删掉的依赖，不留着。
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section class="shell section reveal">
-    <div class="split">
-      <div class="stack">
-        <p class="eyebrow">02 / PRINCIPLES</p>
-        <h2 class="section-head__title">工作方式</h2>
-      </div>
-      <div class="stack">
-        <div class="card">
-          <p class="card__label">Static first</p>
-          <p class="card__value">
-            先假设它是静态的。只有当交互真的需要服务端状态时才加运行时，这一步能省掉大部分性能问题。
-          </p>
-        </div>
-        <div class="card">
-          <p class="card__label">Tokens before components</p>
-          <p class="card__value">
-            颜色、间距、层级先收敛成令牌，再写组件。改主题时只改变量，不动组件，这是能不能长期维护的分水岭。
-          </p>
-        </div>
-        <div class="card">
-          <p class="card__label">Boring over clever</p>
-          <p class="card__value">
-            选别人已经踩过坑的方案。花哨的抽象三个月后通常是负债，无聊的代码活得更久。
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="shell section reveal">
-    <div class="split">
-      <div class="stack">
-        <p class="eyebrow">03 / TOOLS</p>
-        <h2 class="section-head__title">工具链</h2>
-      </div>
-      <div class="stack">
-        {
-          stack.map((group) => (
-            <div>
-              <p class="card__label">{group.label}</p>
-              <ul class="chips">
-                {group.items.map((item) => <li class="chip">{item}</li>)}
-              </ul>
-            </div>
-          ))
-        }
-      </div>
-    </div>
-  </section>
-
-  <section class="shell section reveal">
-    <div class="split">
-      <div class="stack">
-        <p class="eyebrow">04 / NOW</p>
-        <h2 class="section-head__title">最近</h2>
-      </div>
-      <div>
-        <ul class="timeline">
-          <li>
-            <span class="timeline__year">2025 —</span>
-            <span class="timeline__body">
-              <strong>{site.availability}</strong>
-              接设计系统、文档站和 AI 工具界面的项目，远程优先。
-            </span>
-          </li>
-          <li>
-            <span class="timeline__year">2024</span>
-            <span class="timeline__body">
-              <strong>做轻量监控产品</strong>
-              边缘函数加时序可视化，单页 12 KB，冷启动低于 5 ms。
-            </span>
-          </li>
-          <li>
-            <span class="timeline__year">2022 — 2024</span>
-            <span class="timeline__body">
-              <strong>设计系统维护</strong>
-              一套令牌支撑 Web、桌面端与文档三处界面，明暗两套主题零组件分叉。
-            </span>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <section class="shell section reveal">
-    <div class="split">
-      <div class="stack">
-        <p class="eyebrow">05 / CONTACT</p>
-        <h2 class="section-head__title">聊聊</h2>
-      </div>
-      <div class="prose">
-        <p>
-          有项目、有想法，或者只是想聊聊界面，都可以发邮件给我：
-          <a href={`mailto:${site.email}`}>{site.email}</a>。我通常两天内回复。
-        </p>
-        <p>
-          目前住在{site.location}，按北京时间工作，可以对接跨时区的团队。
-        </p>
-      </div>
-    </div>
   </section>
 </Base>

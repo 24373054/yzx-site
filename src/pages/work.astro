@@ -6,21 +6,11 @@ import { projects } from '../data/projects'
 const ordered = [...projects].sort((a, b) => Number(b.year) - Number(a.year))
 ---
 
-<Base
-  title="作品"
-  description="YZX 的作品：界面系统、文档工具与 AI 工作台。"
->
-  <section class="shell hero hero--compact">
-    <p class="eyebrow">WORK / 2024 — 2025</p>
-    <h1 class="display display--2 hero__title">作品</h1>
-    <p class="lede hero__lede">
-      四件东西，从界面系统到边缘监控。每一件都尽量做到：能静态就静态，能少一个依赖就少一个。
-    </p>
-  </section>
-
-  <section class="shell section section--flush">
+<Base title="作品" description="YZX 的作品：界面系统、文档工具与 AI 工作台。">
+  <section class="shell page">
+    <h1 class="visually-hidden">作品</h1>
     <ul class="rows">
-      {ordered.map((project, index) => <WorkRow project={project} index={index} />)}
+      {ordered.map((project) => <WorkRow project={project} />)}
     </ul>
   </section>
 </Base>

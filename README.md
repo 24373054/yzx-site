@@ -4,8 +4,16 @@
 
 - 首页 / 作品 / 文章 / 关于 / 404，共 8 个静态页面
 - 明暗双主题 + 跟随系统，首帧不闪
-- 全站 JS ≈ 11 KB（构建后，含主题运行时），CSS ≈ 50 KB（gzip 后约 9 KB）
+- 全站 JS ≈ 11 KB（构建后，含主题运行时），CSS ≈ 42 KB（gzip 后约 7.6 KB）
 - 部署目标：任意静态托管，推荐 Cloudflare Pages
+
+## 设计原则
+
+首页只有一句宣言、两个列表、一个邮箱。没有小标题、摘要、按钮、标签 —— 作品与文章靠「年份」和「完整日期」的格式差异、以及两段之间的留白区分，而不是靠文字说明。
+
+- 少一层装饰就少一次解释：层级由字号、间距、对齐和颜色承担。
+- 客户端只保留一个主题模块；渐变、噪点、网格、超椭圆圆角、滚动渐入、页面转场全部是 CSS。禁用 JS 后页面依然可读（此时固定浅色，因为暗色令牌由 `body[data-ds-dark-theme]` 激活，缺了脚本就不该切深色画布）。
+- 视觉与动效规范参考 Google Chrome 的 [modern-web-guidance](https://github.com/GoogleChrome/modern-web-guidance)：字号用 rem、`clamp()` 的上下限比值不超过 2.5、标题 `text-wrap: balance` / 正文 `text-wrap: pretty`、减少动效按规则逐条关闭而非常量时长、深色模式由 `color-scheme` 驱动。该 skill 装在 `.agents/skills/` 并随仓库提交（见 `skills-lock.json`）。
 
 ## 预览
 
@@ -53,7 +61,7 @@ Node 版本：24.x（本仓库用 pnpm 10）。
 
 ```text
 src/
-  config.ts             站点元信息（标题、简介、导航、社交链接、邮箱）
+  config.ts             站点元信息（标题、简介、宣言、关于、导航、邮箱、社交链接）
   data/projects.ts      作品列表（纯数据，改这里即可）
   content.config.ts     文章 frontmatter 的 Zod schema
   content/writing/*.mdx 文章
@@ -64,24 +72,25 @@ src/
   pages/                index / work / writing / about / 404 / rss.xml
   scripts/theme.ts      客户端：ThemeRuntime + 主题按钮
   styles/site.css       站点层样式（显示级字阶、编排、art layer）
-  lib/format.ts         日期格式化 + 阅读时长
+  lib/format.ts         日期格式化
 public/                 favicon.svg、og.png、robots.txt
 tools/                  og 图生成、截图与裁剪脚本（仅本地用）
 refs/dsh-ui-kit/        vendor 的上游仓库（只读参考，不参与构建）
+.agents/skills/         modern-web-guidance skill（随仓库提交，见 skills-lock.json）
 ```
 
 ## 常见改动
 
-**改站点信息**：`src/config.ts` 的 `site` 对象是唯一入口（标题、定位、首页宣言、邮箱、社交、导航、页脚 colophon）。
+**改站点信息**：`src/config.ts` 的 `site` 对象是唯一入口（标题、定位、首页宣言、关于两行、邮箱、社交、导航）。
 
-**加一个作品**：在 `src/data/projects.ts` 里追加一条。有 `href` 时整行变成外链（带箭头、hover 浮层）；没有则渲染成不可点的条目。`featured: true` 的进入首页。
+**加一个作品**：在 `src/data/projects.ts` 里追加一条。有 `href` 时整行变成外链，没有则渲染成不可点的条目。`featured: true` 的进入首页，其余只在作品页出现。`summary`、`role`、`tags` 仍保留在数据里备用，当前界面只渲染标题和年份。
 
 **写一篇文章**：新建 `src/content/writing/我的文章.mdx`，frontmatter 必填项：
 
 ```yaml
 ---
 title: 标题
-description: 一句话摘要（会出现在列表和 meta description）
+description: 一句话摘要（用于 meta description 与 RSS；列表只显示标题和日期）
 date: 2026-11-13
 tags: ['设计系统', 'CSS']
 draft: false   # 可选，true 时不上线
@@ -127,11 +136,11 @@ draft: false   # 可选，true 时不上线
 - `pnpm check` 应为 0 errors（当前 8 条 hint 是 Astro 内部 API 的 deprecated 提示之外的噪声，可忽略）。
 - 构建后检查体积：`du -b dist/_astro/*.js dist/_astro/*.css`。
 - 视觉回归：`tools/shots.mjs`（Playwright 驱动本机 Chrome，输出明暗 + 移动端截图到 `.shots/`），`tools/crop.py` 裁剪局部大图，`tools/preview_images.py` 把最终截图压成 `docs/preview/*.jpg`。
-- Lighthouse（13.6，移动端模拟、`pnpm preview` + 本机 Chrome）：首页 100/100/100/100，FCP/LCP 1.1 s、TBT 0 ms、CLS 0、传输 18 KiB；文章页 100/100/100/100，FCP/LCP 0.8 s。
+- Lighthouse（13.6，移动端模拟、`pnpm preview` + 本机 Chrome）：首页 100/100/100/100，FCP 0.8 s、LCP 0.9 s、TBT 30 ms、CLS 0、传输 15 KiB；文章页 100/100/100/100，FCP/LCP 0.8 s、TBT 0 ms、传输 18 KiB。
 - 社交分享图：`tools/make_og.py` 用 Pillow 生成 `public/og.png`（1200×630），配色与站点一致；改品牌信息后重跑一次。
 
 ## 已知取舍
 
 - 没有客户端路由和组件库，每加一个交互都要手写；换来的是没有水合、没有框架运行时。
 - `astro check` 依赖 TypeScript 5.9，升级 Astro 主版本时再评估。
-- 文章正文里的代码块由 Shiki 在构建期高亮，主题固定 `github-dark`（深色，两种站点主题下一致；选它而非 `github-dark-dimmed` 是因为后者注释色对比度不足 WCAG AA）。
+- 文章正文里的代码块由 Shiki 在构建期高亮，主题固定 `github-dark-high-contrast`（两种站点主题下一致）。选它是因为 `github-dark-dimmed` 与 `github-dark` 的注释色对代码底色达不到 WCAG AA 的 4.5:1。
