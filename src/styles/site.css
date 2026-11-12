@@ -38,6 +38,18 @@
   --aurora-b: rgba(124, 92, 255, 0.09);
   --aurora-c: rgba(0, 186, 173, 0.08);
   --grain-opacity: 0.028;
+
+  /* ASCII wind-field palette, read by src/scripts/ascii-field.ts. Tone 1 → 2 → 3
+     is the stroke ramp; alpha keeps the art sitting behind the page. */
+  --field-tone-1: #16204d;
+  --field-tone-2: #3d2f9e;
+  --field-tone-3: #0b5560;
+  --field-alpha: 0.82;
+  --field-grain: rgba(21, 25, 55, 0.45);
+  --field-still: image-set(
+    url('/hero-field-light.avif') type('image/avif'),
+    url('/hero-field-light.webp') type('image/webp')
+  );
 }
 
 /* --- reset & document canvas --------------------------------------------- */
@@ -137,6 +149,16 @@ body[data-ds-dark-theme] {
   --aurora-b: rgba(124, 92, 255, 0.16);
   --aurora-c: rgba(0, 186, 173, 0.12);
   --grain-opacity: 0.05;
+
+  --field-tone-1: #8ea4ff;
+  --field-tone-2: #b79cff;
+  --field-tone-3: #56deda;
+  --field-alpha: 0.9;
+  --field-grain: rgba(255, 255, 255, 0.55);
+  --field-still: image-set(
+    url('/hero-field-dark.avif') type('image/avif'),
+    url('/hero-field-dark.webp') type('image/webp')
+  );
 }
 
 .site-header,
@@ -160,7 +182,7 @@ body[data-ds-dark-theme] {
 }
 
 .section {
-  padding-block: clamp(3rem, 7vw, 5.5rem);
+  padding-block: clamp(2rem, 4vw, 3rem);
 }
 
 .section + .section {
@@ -172,59 +194,53 @@ body[data-ds-dark-theme] {
   padding-block: clamp(2.5rem, 7vh, 4.5rem) clamp(3rem, 8vh, 5rem);
 }
 
-/* --- hero ----------------------------------------------------------------- */
+/* --- hero: an ASCII wind field ------------------------------------------- */
 
+/* The first screen is one piece of generative art instead of copy: a canvas of
+   ~12k short strokes that bend with a wind function (src/scripts/ascii-field.ts).
+   A still of the same field sits behind it, so reduced-motion and no-JS
+   visitors still get the artwork rather than an empty frame. */
 .hero {
-  position: relative;
-  isolation: isolate;
-  padding-block: clamp(4rem, 14vh, 8.5rem) clamp(3rem, 9vh, 6rem);
+  padding-block: clamp(1.75rem, 4.5vh, 3rem) clamp(0.75rem, 2vh, 1.25rem);
 }
 
-/* Architectural hairline grid, clipped at the edges. */
-.hero::before {
-  content: '';
+.field {
+  position: relative;
+  overflow: hidden;
+  block-size: clamp(11rem, 32vh, 25rem);
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 20px;
+  isolation: isolate;
+}
+
+.field__still,
+.field__canvas {
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(
-    to right,
-    var(--dsw-alias-border-l1) 1px,
-    transparent 1px
-  );
-  background-size: calc(100% / 6) 100%;
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    #000 18%,
-    #000 62%,
-    transparent 100%
-  );
-  pointer-events: none;
-  z-index: -1;
+  inline-size: 100%;
+  block-size: 100%;
 }
 
-.hero__title {
-  margin: 0;
+/* The still is only requested when there is no animation to show: reduced
+   motion (media query) or no JavaScript at all (<noscript> style in Base.astro).
+   With motion, the canvas paints the same frame a moment later and the image
+   bytes are never fetched. */
+.field__still {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0;
 }
 
-/* --- display type --------------------------------------------------------- */
-
-.display {
-  margin: 0;
-  font-size: var(--display-1);
-  font-weight: 600;
-  line-height: 1.02;
-  letter-spacing: var(--tracking-display);
-  text-wrap: balance;
+@media (prefers-reduced-motion: reduce) {
+  .field__still {
+    background-image: var(--field-still);
+    opacity: 1;
+  }
 }
 
-.display span {
+.field__canvas {
   display: block;
-}
-
-/* The gradient box must hug the text, otherwise the wide block box pushes the
-   second and third stops past the end of the glyphs. */
-.display .accent {
-  width: fit-content;
 }
 
 .accent {
@@ -694,7 +710,7 @@ body[data-ds-dark-theme] {
 /* --- footer --------------------------------------------------------------- */
 
 .site-footer {
-  margin-top: clamp(3rem, 8vw, 6rem);
+  margin-top: clamp(1.5rem, 4vw, 2.5rem);
   border-top: 1px solid var(--dsw-alias-border-l1);
   padding-block: clamp(2.5rem, 6vw, 4rem);
 }

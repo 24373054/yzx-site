@@ -38,6 +38,17 @@ const feedUrl = new URL('/rss.xml', base).href
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title={`${site.title} · 文章`} href={feedUrl} />
     <meta name="color-scheme" content="light dark" />
+    <!-- Without scripts the hero art has to be the still image; the media query
+         in site.css covers reduced motion, this covers "no JS at all". The
+         stylesheet is injected after this block, hence !important. -->
+    <noscript>
+      <style>
+        .field__still {
+          background-image: var(--field-still);
+          opacity: 1 !important;
+        }
+      </style>
+    </noscript>
 
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={site.title} />

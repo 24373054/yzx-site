@@ -13,13 +13,11 @@ const posts = (await getCollection('writing', ({ data }) => !data.draft))
 
 <Base>
   <section class="shell hero">
-    <h1 class="display hero__title">
-      {
-        site.statement.map((line, index) => (
-          <span class={index === site.statement.length - 1 ? 'accent' : undefined}>{line}</span>
-        ))
-      }
-    </h1>
+    <h1 class="visually-hidden">{site.title} — {site.role}</h1>
+    <div class="field" data-ascii-field>
+      <div class="field__still" aria-hidden="true"></div>
+      <canvas class="field__canvas" aria-hidden="true"></canvas>
+    </div>
   </section>
 
   <section class="shell section">
@@ -36,3 +34,11 @@ const posts = (await getCollection('writing', ({ data }) => !data.draft))
     </ul>
   </section>
 </Base>
+
+<script>
+  import { mountAsciiField } from '../scripts/ascii-field'
+
+  const host = document.querySelector<HTMLElement>('[data-ascii-field]')
+  const canvas = host?.querySelector<HTMLCanvasElement>('canvas')
+  if (host && canvas) mountAsciiField(host, canvas)
+</script>

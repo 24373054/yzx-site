@@ -17,3 +17,7 @@ refs/
 .DS_Store
 Thumbs.db
 *.log
+docs/field-*.png
+docs/enc-*.avif
+docs/enc-*.webp
+docs/edge-check.png
