@@ -3,16 +3,19 @@ import Base from '../layouts/Base.astro'
 import { site } from '../config'
 
 /**
- * The first screen is a board of working surfaces, not a brochure: the artwork,
- * a live clock, the theme switch, the ink palette, the render state and a way to
- * reach me. Nothing here invents copy — every card does something real, and the
- * empty slots for works and words stay empty until there is something to say.
+ * The first screen is a board of working surfaces, not a brochure: a painting
+ * that responds to the pointer, a live clock, the theme switch, the ink palette,
+ * the render state, a real calendar, the type specimen and three dials. Every
+ * card does something; none of them invents copy. Works live below as prints
+ * from the same ink system, and they open.
  */
-const plates = [
-  { span: 1, density: 1.1 },
-  { span: 2, density: 1.7 },
-  { span: 3, density: 1.3 },
-  { span: 4, density: 2.0 },
+const prints = [
+  { index: '01', seed: 1, density: 1.1, span: 1, ratio: '16 : 10', palette: '墨 · 靛' },
+  { index: '02', seed: 2, density: 1.7, span: 2, ratio: '4 : 5', palette: '青 · 松' },
+  { index: '03', seed: 3, density: 1.3, span: 3, ratio: '1 : 1', palette: '靛 · 青' },
+  { index: '04', seed: 4, density: 2.0, span: 4, ratio: '16 : 9', palette: '松 · 紫' },
+  { index: '05', seed: 5, density: 1.45, span: 5, ratio: '4 : 3', palette: '紫 · 青' },
+  { index: '06', seed: 6, density: 1.75, span: 6, ratio: '16 : 9', palette: '青 · 紫' },
 ]
 
 const swatches = [
@@ -20,12 +23,24 @@ const swatches = [
   { name: '靛', tone: 'var(--field-tone-2)' },
   { name: '青', tone: 'var(--field-tone-3)' },
   { name: '纸', tone: 'var(--dsw-alias-bg-base)' },
+  { name: '字', tone: 'var(--dsw-alias-label-primary)' },
+  { name: '界', tone: 'var(--dsw-alias-border-l2)' },
+  { name: '雾', tone: 'var(--dsw-alias-bg-overlay)' },
+  { name: '层', tone: 'var(--dsw-alias-bg-layer-2)' },
 ]
 
 const themes = [
   { value: 'light', label: '浅色' },
   { value: 'dark', label: '深色' },
   { value: 'system', label: '跟随系统' },
+]
+
+const typeScale = [
+  { label: '24', size: '1.5rem' },
+  { label: '20', size: '1.25rem' },
+  { label: '16', size: '1rem' },
+  { label: '14', size: '0.875rem' },
+  { label: '12', size: '0.75rem' },
 ]
 ---
 
@@ -35,11 +50,10 @@ const themes = [
 
   <div class="board">
     <!--
-      The painting is not a card: it has no surface, no border, and its strokes
-      dissolve at every edge, so the board sits next to the ink instead of
-      framing it. The layers below exist so the art is never a blank rectangle
-      for a moment — a blurred echo paints instantly, the live canvas fades in
-      over it, and the sharp still only appears for reduced-motion visitors.
+      The painting is not a card: no surface, no border, no radius. Its strokes
+      dissolve at every edge, so the board leans against the ink instead of
+      framing it. The echo paints the first frame instantly, the live canvas
+      fades in over it, and the sharp still only appears when canvas cannot run.
     -->
     <section class="stage" data-ascii-field aria-label="生成艺术：墨流">
       <div class="stage__echo" aria-hidden="true"></div>
@@ -66,11 +80,19 @@ const themes = [
     </section>
 
     <section class="card card--clock" aria-label="本地时间">
-      <p class="card__figure clock__time" data-clock-time>00:00</p>
+      <div class="card__head">
+        <p class="card__label">本地时间</p>
+        <span class="card__flag" data-clock-zone>—</span>
+      </div>
+      <p class="clock__time" data-clock-time>00:00</p>
       <p class="card__meta clock__date" data-clock-date>—</p>
     </section>
 
     <section class="card card--theme" aria-label="外观">
+      <div class="card__head">
+        <p class="card__label">外观</p>
+        <span class="card__flag" data-theme-note>跟随系统</span>
+      </div>
       <div class="seg" role="group" aria-label="主题">
         {
           themes.map((theme) => (
@@ -83,79 +105,134 @@ const themes = [
             >
               {theme.value === 'light' && (
                 <svg viewBox="0 0 16 16" aria-hidden="true">
-                  <circle cx="8" cy="8" r="3.1" fill="none" stroke="currentColor" stroke-width="1.3"></circle>
+                  <circle cx="8" cy="8" r="3.1" fill="none" stroke="currentColor" stroke-width="1.3" />
                   <g stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
-                    <path d="M8 1.3v1.8M8 12.9v1.8M1.3 8h1.8M12.9 8h1.8M3.3 3.3l1.3 1.3M11.4 11.4l1.3 1.3M12.7 3.3l-1.3 1.3M4.6 11.4l-1.3 1.3"></path>
+                    <path d="M8 1.3v1.8M8 12.9v1.8M1.3 8h1.8M12.9 8h1.8M3.3 3.3l1.3 1.3M11.4 11.4l1.3 1.3M12.7 3.3l-1.3 1.3M4.6 11.4l-1.3 1.3" />
                   </g>
                 </svg>
               )}
               {theme.value === 'dark' && (
                 <svg viewBox="0 0 16 16" aria-hidden="true">
-                  <path d="M13.2 9.7A5.6 5.6 0 0 1 6.3 2.8a5.6 5.6 0 1 0 6.9 6.9Z" fill="currentColor"></path>
+                  <path d="M13.2 9.7A5.6 5.6 0 0 1 6.3 2.8a5.6 5.6 0 1 0 6.9 6.9Z" fill="currentColor" />
                 </svg>
               )}
               {theme.value === 'system' && (
                 <svg viewBox="0 0 16 16" aria-hidden="true">
-                  <circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.3"></circle>
-                  <path d="M8 2.8a5.2 5.2 0 0 1 0 10.4Z" fill="currentColor"></path>
+                  <circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.3" />
+                  <path d="M8 2.8a5.2 5.2 0 0 1 0 10.4Z" fill="currentColor" />
                 </svg>
               )}
             </button>
           ))
         }
       </div>
-      <p class="card__meta" data-theme-note>跟随系统</p>
     </section>
 
     <section class="card card--state" aria-label="渲染状态">
+      <div class="card__head">
+        <p class="card__label">渲染</p>
+        <span class="card__flag"><span data-stat="fps">—</span> fps</span>
+      </div>
+      <svg class="spark" viewBox="0 0 160 40" preserveAspectRatio="none" aria-hidden="true">
+        <polyline data-spark points="" />
+      </svg>
       <dl class="stats">
-        <div class="stats__row"><dt>帧率</dt><dd data-stat="fps">—</dd></div>
-        <div class="stats__row"><dt>笔触</dt><dd data-stat="strokes">—</dd></div>
-        <div class="stats__row"><dt>强度</dt><dd data-stat="intensity">1.00</dd></div>
+        <div><dt>笔触</dt><dd data-stat="strokes">—</dd></div>
+        <div><dt>强度</dt><dd data-stat="intensity">1.00</dd></div>
       </dl>
     </section>
 
-    <section class="card card--palette" aria-label="墨色">
+    <section class="card card--palette" aria-label="色板">
+      <div class="card__head">
+        <p class="card__label">色板</p>
+        <span class="card__flag" data-copy-note>点击复制</span>
+      </div>
       <div class="swatches">
         {
           swatches.map((swatch) => (
-            <button class="swatch" type="button" data-copy-hex={swatch.tone} aria-label={`复制${swatch.name}色值`}>
-              <span class="swatch__chip" style={`--swatch: ${swatch.tone}`} aria-hidden="true"></span>
+            <button class="swatch" type="button" data-copy-color={swatch.tone} aria-label={`复制${swatch.name}色值`}>
+              <span class="swatch__chip" style={`--swatch: ${swatch.tone}`} aria-hidden="true" />
               <span class="swatch__name" aria-hidden="true">{swatch.name}</span>
             </button>
           ))
         }
       </div>
-      <p class="card__meta" data-copy-note>点击复制色值</p>
+    </section>
+
+    <section class="card card--motion" aria-label="动画">
+      <div class="card__head">
+        <p class="card__label">动画</p>
+      </div>
+      <label class="switch">
+        <input class="switch__input" type="checkbox" checked data-motion-switch {...({ switch: '' } as any)} />
+        <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
+        <span class="switch__text" data-motion-note>运行中</span>
+      </label>
+    </section>
+
+    <section class="card card--calendar" aria-labelledby="cal-label">
+      <div class="card__head">
+        <p class="card__label" id="cal-label" data-cal-title>—</p>
+        <div class="cal__nav">
+          <button class="cal__btn" type="button" data-cal-step="-1" aria-label="上个月">‹</button>
+          <button class="cal__btn" type="button" data-cal-step="1" aria-label="下个月">›</button>
+        </div>
+      </div>
+      <div class="cal">
+        <div class="cal__week" aria-hidden="true">
+          <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
+        </div>
+        <ol class="cal__grid" data-cal-grid aria-label="本月的日期"></ol>
+      </div>
     </section>
 
     <a class="card card--contact" href={site.socials[0].href} rel="me noopener" target="_blank" id="contact">
+      <div class="card__head">
+        <p class="card__label">联系</p>
+        <span class="card__flag">github</span>
+      </div>
       <span class="contact__text">GitHub</span>
       <span class="contact__arrow" aria-hidden="true">↗</span>
     </a>
 
-    <section class="card card--slider" aria-label="字号">
-      <div class="card__row">
-        <label class="card__label" for="type-scale">字号</label>
-        <output class="card__value" for="type-scale" data-type-value>100%</output>
-      </div>
-      <input class="slider" id="type-scale" type="range" min="0.9" max="1.15" step="0.01" value="1" data-type-scale />
+    <section class="card card--type" aria-label="排版">
+      <p class="specimen" aria-hidden="true">Aa</p>
+      <ul class="scale">
+        {
+          typeScale.map((row) => (
+            <li>
+              <span class="scale__sample" style={`font-size: ${row.size}`}>字</span>
+              <span class="scale__label">{row.label}</span>
+            </li>
+          ))
+        }
+      </ul>
     </section>
 
-    <section class="card card--slider" aria-label="噪点">
-      <div class="card__row">
-        <label class="card__label" for="grain-scale">噪点</label>
-        <output class="card__value" for="grain-scale" data-grain-value>0.028</output>
+    <section class="card card--dials" aria-label="参数">
+      <div class="dial-row">
+        <div class="card__head">
+          <label class="card__label" for="type-scale">字号</label>
+          <output class="card__flag" for="type-scale" data-type-value>100%</output>
+        </div>
+        <input class="slider" id="type-scale" type="range" min="0.9" max="1.15" step="0.01" value="1" data-type-scale />
       </div>
-      <input class="slider" id="grain-scale" type="range" min="0" max="0.07" step="0.002" value="0.028" data-grain-scale />
-    </section>
 
-    <section class="card card--slider" aria-label="流速">
-      <div class="card__row">
-        <label class="card__label" for="speed-scale">流速</label>
-        <output class="card__value" for="speed-scale" data-speed-value>1.00×</output>
+      <div class="dial-row">
+        <div class="card__head">
+          <label class="card__label" for="grain-scale">噪点</label>
+          <output class="card__flag" for="grain-scale" data-grain-value>0.028</output>
+        </div>
+        <input class="slider" id="grain-scale" type="range" min="0" max="0.07" step="0.002" value="0.028" data-grain-scale />
       </div>
-      <input class="slider" id="speed-scale" type="range" min="0.4" max="1.6" step="0.05" value="1" data-speed-scale />
+
+      <div class="dial-row">
+        <div class="card__head">
+          <label class="card__label" for="speed-scale">流速</label>
+          <output class="card__flag" for="speed-scale" data-speed-value>1.00×</output>
+        </div>
+        <input class="slider" id="speed-scale" type="range" min="0.4" max="1.6" step="0.05" value="1" data-speed-scale />
+      </div>
     </section>
   </div>
 
@@ -163,29 +240,61 @@ const themes = [
     <section class="sec" id="work" aria-labelledby="work-label">
       <div class="sec__head">
         <p class="sec__label" id="work-label"><span class="sec__num">01</span>作品</p>
-        <p class="sec__aside" aria-hidden="true">精选</p>
+        <p class="sec__aside" aria-hidden="true">06 幅 · seed 01–06</p>
       </div>
       <ul class="plates">
         {
-          plates.map((plate) => (
-            <li class={`plate plate--${plate.span}`}>
-              <span class="plate__wash" aria-hidden="true" />
-              <canvas
-                class="plate__art"
-                data-plate-art
-                data-seed={plate.span}
-                data-density={plate.density}
-                aria-hidden="true"
-              />
-              <span class="plate__num" aria-hidden="true">
-                {String(plate.span).padStart(2, '0')}
-              </span>
+          prints.map((print) => (
+            <li class={`plate plate--${print.span}`}>
+              <button
+                class="plate__open"
+                type="button"
+                data-print-open
+                data-seed={print.seed}
+                data-density={print.density}
+                data-index={print.index}
+                data-palette={print.palette}
+                data-ratio={print.ratio}
+                aria-label={`查看印张 ${print.index}`}
+              >
+                <span class="plate__wash" aria-hidden="true" />
+                <canvas
+                  class="plate__art"
+                  data-plate-art
+                  data-seed={print.seed}
+                  data-density={print.density}
+                  aria-hidden="true"
+                />
+                <span class="plate__hover" aria-hidden="true">查看</span>
+              </button>
+              <div class="plate__info">
+                <span class="plate__index">{print.index}</span>
+                <span class="plate__meta">{print.palette} · seed {String(print.seed).padStart(2, '0')} · 密度 {print.density.toFixed(1)}</span>
+                <span class="plate__ratio">{print.ratio}</span>
+              </div>
             </li>
           ))
         }
       </ul>
     </section>
   </div>
+
+  <dialog class="viewer" id="print-viewer" closedby="any" aria-labelledby="viewer-title">
+    <div class="viewer__frame" data-viewer-frame>
+      <canvas class="viewer__canvas" data-viewer-canvas aria-hidden="true"></canvas>
+    </div>
+    <div class="viewer__bar">
+      <p class="viewer__title" id="viewer-title">印张</p>
+      <p class="viewer__meta" data-viewer-meta></p>
+      <form method="dialog">
+        <button class="viewer__close" value="close" autofocus aria-label="关闭">
+          <svg viewBox="0 0 16 16" aria-hidden="true" width="14" height="14">
+            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          </svg>
+        </button>
+      </form>
+    </div>
+  </dialog>
 </Base>
 
 <script>
@@ -194,45 +303,88 @@ const themes = [
   const still = new URLSearchParams(location.search).has('still')
   const host = document.querySelector<HTMLElement>('[data-ascii-field]')
   const canvas = host?.querySelector<HTMLCanvasElement>('canvas')
-
   const pad = (value: number) => String(value).padStart(2, '0')
 
-  if (host && canvas) {
-    const field = mountAsciiField(host, canvas, {
-      frozen: still,
-      onStats: ({ fps, strokes }) => {
-        const fpsNode = document.querySelector<HTMLElement>('[data-stat="fps"]')
-        const strokesNode = document.querySelector<HTMLElement>('[data-stat="strokes"]')
-        if (fpsNode) fpsNode.textContent = String(fps)
-        if (strokesNode) strokesNode.textContent = String(strokes)
-      },
-    })
+  // --- the painting -------------------------------------------------------
+  const fpsHistory: number[] = []
+  const spark = document.querySelector<SVGPolylineElement>('[data-spark]')
+  const fpsNode = document.querySelector<HTMLElement>('[data-stat="fps"]')
+  const strokesNode = document.querySelector<HTMLElement>('[data-stat="strokes"]')
+  const strengthNode = document.querySelector<HTMLElement>('[data-stat="intensity"]')
 
-    const speedScale = document.querySelector<HTMLInputElement>('[data-speed-scale]')
-    const speedValue = document.querySelector<HTMLOutputElement>('[data-speed-value]')
-    speedScale?.addEventListener('input', () => {
-      const value = Number(speedScale.value)
-      field.setSpeed(value)
-      if (speedValue) speedValue.textContent = `${value.toFixed(2)}×`
-    })
-
-    const dial = document.querySelector<HTMLInputElement>('[data-ink-intensity]')
-    const strength = document.querySelector<HTMLElement>('[data-stat="intensity"]')
-    dial?.addEventListener('input', () => {
-      const value = Number(dial.value)
-      field.setIntensity(value)
-      if (strength) strength.textContent = value.toFixed(2)
-    })
+  const paintSpark = () => {
+    if (!spark || fpsHistory.length < 2) return
+    const points = fpsHistory
+      .map((fps, index) => {
+        const x = (index / (fpsHistory.length - 1)) * 160
+        const y = 40 - Math.min(1, fps / 120) * 34 - 3
+        return `${x.toFixed(1)},${y.toFixed(1)}`
+      })
+      .join(' ')
+    spark.setAttribute('points', points)
   }
 
-  // Type scale, grain and current speed: small tools, not decoration.
+  const motionSwitch = document.querySelector<HTMLInputElement>('[data-motion-switch]')
+  const motionNote = document.querySelector<HTMLElement>('[data-motion-note]')
+
+  const field = host && canvas
+    ? mountAsciiField(host, canvas, {
+        frozen: still,
+        onStats: ({ fps, strokes }) => {
+          if (fpsNode) fpsNode.textContent = String(fps)
+          if (strokesNode) strokesNode.textContent = String(strokes)
+          fpsHistory.push(fps)
+          if (fpsHistory.length > 48) fpsHistory.shift()
+          paintSpark()
+        },
+        onPaused: (paused) => {
+          if (motionSwitch) motionSwitch.checked = !paused
+          if (motionNote) motionNote.textContent = paused ? '已暂停' : '运行中'
+        },
+      })
+    : null
+
+  motionSwitch?.addEventListener('change', () => {
+    if (motionSwitch.checked) field?.play()
+    else field?.pause()
+  })
+
+  // --- dials ---------------------------------------------------------------
+  const fillSlider = (input: HTMLInputElement) => {
+    const min = Number(input.min || 0)
+    const max = Number(input.max || 100)
+    const ratio = (Number(input.value) - min) / (max - min || 1)
+    input.style.setProperty('--slider-fill', `${(ratio * 100).toFixed(2)}%`)
+  }
+
+  const speedScale = document.querySelector<HTMLInputElement>('[data-speed-scale]')
+  const speedValue = document.querySelector<HTMLOutputElement>('[data-speed-value]')
+  speedScale?.addEventListener('input', () => {
+    const value = Number(speedScale.value)
+    field?.setSpeed(value)
+    if (speedValue) speedValue.textContent = `${value.toFixed(2)}×`
+    fillSlider(speedScale)
+  })
+  if (speedScale) fillSlider(speedScale)
+
+  const inkDial = document.querySelector<HTMLInputElement>('[data-ink-intensity]')
+  inkDial?.addEventListener('input', () => {
+    const value = Number(inkDial.value)
+    field?.setIntensity(value)
+    if (strengthNode) strengthNode.textContent = value.toFixed(2)
+    fillSlider(inkDial)
+  })
+  if (inkDial) fillSlider(inkDial)
+
   const typeScale = document.querySelector<HTMLInputElement>('[data-type-scale]')
   const typeValue = document.querySelector<HTMLOutputElement>('[data-type-value]')
   typeScale?.addEventListener('input', () => {
     const value = Number(typeScale.value)
     document.documentElement.style.fontSize = `${(16 * value).toFixed(2)}px`
     if (typeValue) typeValue.textContent = `${Math.round(value * 100)}%`
+    fillSlider(typeScale)
   })
+  if (typeScale) fillSlider(typeScale)
 
   const grainScale = document.querySelector<HTMLInputElement>('[data-grain-scale]')
   const grainValue = document.querySelector<HTMLOutputElement>('[data-grain-value]')
@@ -240,11 +392,15 @@ const themes = [
     const value = Number(grainScale.value)
     document.documentElement.style.setProperty('--grain-opacity', String(value))
     if (grainValue) grainValue.textContent = value.toFixed(3)
+    fillSlider(grainScale)
   })
+  if (grainScale) fillSlider(grainScale)
 
-  // The clock is a real card, so it shows the visitor's time, not a fake one.
+  // --- clock ---------------------------------------------------------------
   const timeNode = document.querySelector<HTMLElement>('[data-clock-time]')
   const dateNode = document.querySelector<HTMLElement>('[data-clock-date]')
+  const zoneNode = document.querySelector<HTMLElement>('[data-clock-zone]')
+
   const paintClock = () => {
     const now = new Date()
     if (timeNode) timeNode.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}`
@@ -254,57 +410,162 @@ const themes = [
         day: 'numeric',
         weekday: 'short',
       }).format(now)
+    if (zoneNode) {
+      const offset = -now.getTimezoneOffset() / 60
+      const hours = Math.trunc(offset)
+      const minutes = Math.round(Math.abs(offset % 1) * 60)
+      zoneNode.textContent = `UTC${offset >= 0 ? '+' : '−'}${pad(Math.abs(hours))}${minutes ? ':' + pad(minutes) : ''}`
+    }
   }
   paintClock()
   window.setInterval(paintClock, 15000)
 
-  // Clicking a swatch copies its computed colour: the palette is a real tool.
-  const copyNote = document.querySelector<HTMLElement>('[data-copy-note]')
-  document.querySelectorAll<HTMLButtonElement>('[data-copy-hex]').forEach((button) => {
-    button.addEventListener('click', async () => {
-      const chip = button.querySelector<HTMLElement>('.swatch__chip')
-      if (!chip) return
-      const hex = getComputedStyle(chip).getPropertyValue('--swatch').trim()
-      try {
-        await navigator.clipboard.writeText(hex)
-        if (copyNote) copyNote.textContent = '已复制色值'
-      } catch {
-        if (copyNote) copyNote.textContent = '复制失败'
-      }
-      window.setTimeout(() => {
-        if (copyNote) copyNote.textContent = '点击复制色值'
-      }, 1400)
+  // --- calendar ------------------------------------------------------------
+  const calGrid = document.querySelector<HTMLElement>('[data-cal-grid]')
+  const calTitle = document.querySelector<HTMLElement>('[data-cal-title]')
+  const today = new Date()
+  let calView = new Date(today.getFullYear(), today.getMonth(), 1)
+
+  const renderCalendar = (base: Date) => {
+    if (!calGrid || !calTitle) return
+    const year = base.getFullYear()
+    const month = base.getMonth()
+    calTitle.textContent = `${year} 年 ${month + 1} 月`
+    const offset = (new Date(year, month, 1).getDay() + 6) % 7
+    const days = new Date(year, month + 1, 0).getDate()
+    const prevDays = new Date(year, month, 0).getDate()
+    const cells: string[] = []
+
+    for (let i = offset - 1; i >= 0; i -= 1) {
+      cells.push(`<li class="cal__day" data-outside>${prevDays - i}</li>`)
+    }
+    for (let day = 1; day <= days; day += 1) {
+      const isToday =
+        day === today.getDate() && month === today.getMonth() && year === today.getFullYear()
+      cells.push(`<li class="cal__day"${isToday ? ' aria-current="date"' : ''}>${day}</li>`)
+    }
+    let next = 1
+    while (cells.length < 42) {
+      cells.push(`<li class="cal__day" data-outside>${next}</li>`)
+      next += 1
+    }
+    calGrid.innerHTML = cells.join('')
+  }
+  renderCalendar(calView)
+
+  document.querySelectorAll<HTMLElement>('[data-cal-step]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const step = Number(button.dataset.calStep || 1)
+      calView = new Date(calView.getFullYear(), calView.getMonth() + step, 1)
+      renderCalendar(calView)
     })
   })
 
-  // Work covers are single frozen frames of the same system: prints, not
-  // screenshots. They sit below the fold, so mount each one only as it comes
-  // near the viewport instead of warming four canvases before the first paint.
-  const plateCanvases = Array.from(
-    document.querySelectorAll<HTMLCanvasElement>('[data-plate-art]'),
-  )
-  const paintPlate = (plateCanvas: HTMLCanvasElement) => {
-    const index = plateCanvases.indexOf(plateCanvas)
-    mountAsciiField(plateCanvas, plateCanvas, {
+  // --- palette copy --------------------------------------------------------
+  const copyNote = document.querySelector<HTMLElement>('[data-copy-note]')
+  const copyFeedback = (message: string) => {
+    if (!copyNote) return
+    const original = copyNote.textContent || '点击复制'
+    copyNote.textContent = message
+    window.setTimeout(() => {
+      copyNote.textContent = original
+    }, 1400)
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-copy-color]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const chip = button.querySelector<HTMLElement>('.swatch__chip')
+      if (!chip) return
+      const color = getComputedStyle(chip).backgroundColor
+      try {
+        await navigator.clipboard.writeText(color)
+        copyFeedback('已复制')
+      } catch {
+        copyFeedback('复制失败')
+      }
+    })
+  })
+
+  // --- prints --------------------------------------------------------------
+  const mountPlate = (plate: HTMLCanvasElement) => {
+    mountAsciiField(plate, plate, {
       frozen: true,
-      seed: Number(plateCanvas.dataset.seed) || index + 1,
-      density: Number(plateCanvas.dataset.density) || 3.4,
+      seed: Number(plate.dataset.seed) || 1,
+      density: Number(plate.dataset.density) || 1.4,
     })
   }
 
+  const plates = document.querySelectorAll<HTMLCanvasElement>('[data-plate-art]')
   if ('IntersectionObserver' in window) {
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue
-          paintPlate(entry.target as HTMLCanvasElement)
+          mountPlate(entry.target as HTMLCanvasElement)
           observer.unobserve(entry.target)
         }
       },
       { rootMargin: '320px 0px' },
     )
-    plateCanvases.forEach((plateCanvas) => observer.observe(plateCanvas))
+    plates.forEach((plate) => observer.observe(plate))
   } else {
-    plateCanvases.forEach(paintPlate)
+    plates.forEach(mountPlate)
+  }
+
+  // --- viewer --------------------------------------------------------------
+  const viewer = document.querySelector<HTMLDialogElement>('#print-viewer')
+  const viewerFrame = document.querySelector<HTMLElement>('[data-viewer-frame]')
+  const viewerCanvas = document.querySelector<HTMLCanvasElement>('[data-viewer-canvas]')
+  const viewerTitle = document.querySelector<HTMLElement>('#viewer-title')
+  const viewerMeta = document.querySelector<HTMLElement>('[data-viewer-meta]')
+  let viewerField: ReturnType<typeof mountAsciiField> | null = null
+
+  const openViewer = (trigger: HTMLElement) => {
+    if (!viewer || !viewerFrame || !viewerCanvas) return
+    const { seed, density, index, palette, ratio } = trigger.dataset
+    viewerTitle && (viewerTitle.textContent = `印张 ${index ?? ''}`)
+    if (viewerMeta)
+      viewerMeta.textContent = `${palette ?? ''} · seed ${pad(Number(seed) || 1)} · 密度 ${Number(density || 1).toFixed(1)} · ${ratio ?? ''}`
+    viewer.showModal()
+    viewerField?.dispose()
+    viewerField = mountAsciiField(viewerFrame, viewerCanvas, {
+      frozen: true,
+      seed: Number(seed) || 1,
+      density: Number(density) || 1.4,
+    })
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-print-open]').forEach((trigger) => {
+    trigger.addEventListener('click', () => openViewer(trigger))
+  })
+
+  viewer?.addEventListener('close', () => {
+    viewerField?.dispose()
+    viewerField = null
+    viewerFrame?.classList.remove('is-live')
+    if (viewerCanvas) {
+      const context = viewerCanvas.getContext('2d')
+      context?.clearRect(0, 0, viewerCanvas.width, viewerCanvas.height)
+    }
+  })
+
+  // Light dismiss where `closedby` is missing; Esc already works natively.
+  if (viewer && !('closedBy' in HTMLDialogElement.prototype)) {
+    const isOutside = (event: PointerEvent) => {
+      const rect = viewer.getBoundingClientRect()
+      return (
+        event.clientX < rect.left ||
+        event.clientX > rect.right ||
+        event.clientY < rect.top ||
+        event.clientY > rect.bottom
+      )
+    }
+    let pressedOutside = false
+    viewer.addEventListener('pointerdown', (event) => {
+      pressedOutside = isOutside(event)
+    })
+    viewer.addEventListener('pointerup', (event) => {
+      if (pressedOutside && isOutside(event)) viewer.close()
+    })
   }
 </script>

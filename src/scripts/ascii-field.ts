@@ -20,6 +20,8 @@ export interface MountOptions {
   seed?: number
   /** Called about twice a second with live numbers for the status card. */
   onStats?: (stats: { fps: number; strokes: number }) => void
+  /** Called whenever playback is paused or resumed, from any control. */
+  onPaused?: (paused: boolean) => void
 }
 
 interface Palette {
@@ -439,6 +441,7 @@ const mountField = (host: HTMLElement, canvas: HTMLCanvasElement, options: Mount
     host.toggleAttribute('data-field-paused', paused)
     toggle?.toggleAttribute('data-field-paused', paused)
     toggle?.setAttribute('aria-label', paused ? '播放动画' : '暂停动画')
+    options.onPaused?.(paused)
     if (paused) stop()
     else if (!reducedMotion.matches) start()
   }

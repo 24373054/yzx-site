@@ -744,6 +744,17 @@ html {
   aspect-ratio: 16 / 9;
 }
 
+.plate--5 {
+  grid-column: span 5;
+  aspect-ratio: 4 / 3;
+  margin-block-start: clamp(0.75rem, 3vw, 2.25rem);
+}
+
+.plate--6 {
+  grid-column: span 7;
+  aspect-ratio: 16 / 9;
+}
+
 /* Four palettes, all pulled from the same ink: violet, jade, indigo, pine. */
 .plate--1 {
   --field-tone-1: #1b2350;
@@ -795,6 +806,32 @@ body[data-ds-dark-theme] .plate--4 {
   --field-tone-1: #8fdcc6;
   --field-tone-2: #a8fff0;
   --field-tone-3: #c3a8ff;
+}
+
+.plate--5 {
+  --field-tone-1: #2a1f52;
+  --field-tone-2: #7a5cd6;
+  --field-tone-3: #0f5e63;
+  --field-alpha: 0.9;
+}
+
+.plate--6 {
+  --field-tone-1: #102e36;
+  --field-tone-2: #1f8f86;
+  --field-tone-3: #4a3a8f;
+  --field-alpha: 0.9;
+}
+
+body[data-ds-dark-theme] .plate--5 {
+  --field-tone-1: #cbb6ff;
+  --field-tone-2: #b39bff;
+  --field-tone-3: #7ff0e2;
+}
+
+body[data-ds-dark-theme] .plate--6 {
+  --field-tone-1: #8ef0e0;
+  --field-tone-2: #7fe6dc;
+  --field-tone-3: #c7b0ff;
 }
 
 .plate__wash {
@@ -928,12 +965,13 @@ body[data-ds-dark-theme] .plate--4 {
   }
 }
 
-@supports (animation-timeline: view()) {
+/* The support test must include animation-range: entry — browsers with only a
+   partial view-timeline implementation would otherwise land elements at
+   opacity 0 and keep them there. */
+@supports ((animation-timeline: view()) and (animation-range: entry)) {
   @media (prefers-reduced-motion: no-preference) {
     .sec__head,
-    .plate,
-    .line,
-    .contact {
+    .plate {
       animation: rise linear both;
       animation-timeline: view();
       animation-range: entry 4% cover 30%;
@@ -998,85 +1036,293 @@ body[data-ds-dark-theme] .plate--4 {
 }
 
 
-/* --- the board: the first screen as working surfaces ----------------------- */
+/* --- the board: the first screen as a work surface ------------------------- */
 
-/* The page is a neutral board and every card is a real surface: no borders, one
-   large radius, one soft shadow. The artwork keeps its own rules and simply
-   occupies part of the board instead of being framed by it. */
 :root {
   --board-canvas: #f2f2ef;
   --card-bg: #ffffff;
   --card-radius: 22px;
+  --card-pad: clamp(0.95rem, 1.35vw, 1.3rem);
   --card-meta: var(--dsw-alias-label-tertiary);
-  --card-shadow: 0 1px 2px rgba(18, 19, 24, 0.05), 0 12px 32px rgba(18, 19, 24, 0.05);
+  --card-hair: color-mix(in srgb, var(--dsw-alias-label-primary) 9%, transparent);
+  --card-shadow: 0 1px 2px rgba(18, 19, 24, 0.04), 0 14px 34px rgba(18, 19, 24, 0.05);
   --canvas-light: #f2f2ef;
   --canvas-dark: #0b0b0d;
 }
 
 body[data-ds-dark-theme] {
   --card-bg: #17171a;
-  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.35);
+  --card-hair: color-mix(in srgb, #ffffff 11%, transparent);
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.55), 0 18px 40px rgba(0, 0, 0, 0.3);
 }
 
+/* The board is a 12-column sheet of working surfaces. The painting is not one
+   of them: it sits directly on the sheet, and the cards lean against it. */
 .board {
   position: relative;
   z-index: 1;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-auto-rows: minmax(9rem, auto);
-  gap: clamp(0.65rem, 1vw, 1rem);
-  max-inline-size: 1320px;
+  grid-auto-rows: minmax(9.75rem, auto);
+  gap: clamp(0.6rem, 0.95vw, 0.95rem);
+  inline-size: min(100% - 2 * var(--site-gutter), 1320px);
   margin-inline: auto;
-  padding: calc(var(--site-header-h) + 0.75rem) var(--site-gutter)
-    clamp(1rem, 3vw, 2rem);
+  padding-block: calc(var(--site-header-h) + 0.9rem) clamp(1rem, 2.4vw, 2rem);
 }
 
-/* No surface, no radius, no frame: the painting is one block of the board. */
 .board .stage {
-  grid-column: span 8;
-  grid-row: span 3;
+  grid-column: 1 / 9;
+  grid-row: 1 / 4;
   block-size: auto;
-  min-block-size: 26rem;
+  min-block-size: 0;
+  overflow: clip;
+  border-radius: 0;
   animation: none;
 }
 
+.stage__controls {
+  position: absolute;
+  inset-block-end: clamp(0.75rem, 1.4vw, 1.1rem);
+  inset-inline-start: clamp(0.75rem, 1.4vw, 1.1rem);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.board .icon-toggle {
+  inline-size: 2.4rem;
+  block-size: 2.4rem;
+  border: 0;
+  background: color-mix(in oklab, var(--card-bg) 82%, transparent);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(10px);
+  color: var(--dsw-alias-label-secondary);
+  transition:
+    color 0.25s var(--ease),
+    background 0.25s var(--ease),
+    transform 0.25s var(--ease);
+}
+
+.board .icon-toggle:hover {
+  color: var(--dsw-alias-label-primary);
+  transform: translateY(-1px);
+}
+
+.board .icon-toggle:focus-visible,
+.board .dial:focus-within {
+  outline: 2px solid var(--dsw-alias-label-primary);
+  outline-offset: 3px;
+}
+
+.dial {
+  display: grid;
+  align-items: center;
+  inline-size: 7.25rem;
+  block-size: 2.4rem;
+  padding-inline: 0.85rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--card-bg) 82%, transparent);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(10px);
+}
+
+.dial__track {
+  display: none;
+}
+
+.dial__input {
+  --slider-fill: 50%;
+  appearance: none;
+  -webkit-appearance: none;
+  inline-size: 100%;
+  block-size: 1.1rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dial__input::-webkit-slider-runnable-track {
+  block-size: 0.18rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    var(--dsw-alias-label-primary) var(--slider-fill),
+    color-mix(in srgb, var(--dsw-alias-label-primary) 18%, transparent) var(--slider-fill)
+  );
+}
+
+.dial__input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  inline-size: 0.85rem;
+  block-size: 0.85rem;
+  margin-block-start: -0.335rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--card-bg);
+  box-shadow:
+    0 0 0 1.5px var(--dsw-alias-label-primary),
+    0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.dial__input::-moz-range-track {
+  block-size: 0.18rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary) 18%, transparent);
+}
+
+.dial__input::-moz-range-progress {
+  block-size: 0.18rem;
+  border-radius: 999px;
+  background: var(--dsw-alias-label-primary);
+}
+
+.dial__input::-moz-range-thumb {
+  inline-size: 0.85rem;
+  block-size: 0.85rem;
+  border: 0;
+  border-radius: 50%;
+  background: var(--card-bg);
+  box-shadow:
+    0 0 0 1.5px var(--dsw-alias-label-primary),
+    0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* --- cards ---------------------------------------------------------------- */
+
 .card {
   position: relative;
-  grid-column: span 4;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: clamp(1rem, 1.5vw, 1.35rem);
-  background: var(--card-bg);
+  gap: 0.7rem;
+  min-inline-size: 0;
+  padding: var(--card-pad);
   border-radius: var(--card-radius);
+  background: var(--card-bg);
   box-shadow: var(--card-shadow);
   color: var(--dsw-alias-label-primary);
 }
 
-.card__figure {
+.card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  min-block-size: 1.25rem;
+}
+
+.card__label {
   margin: 0;
-  font-size: clamp(2.1rem, 2.7vw, 2.6rem);
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -0.05em;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.card__flag {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: var(--card-meta);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .card__meta {
   margin: 0;
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
   color: var(--card-meta);
 }
 
-.card--theme,
-.card--palette {
-  align-items: flex-start;
+.card--clock {
+  grid-column: 9 / 13;
+  grid-row: 1 / 2;
+  justify-content: space-between;
 }
 
-/* Segmented control: one track, one raised thumb, no borders. */
+.clock__time {
+  margin: auto 0 0;
+  font-size: clamp(2.1rem, 3vw, 2.8rem);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  font-variant-numeric: tabular-nums;
+}
+
+.clock__date {
+  margin: 0;
+}
+
+.card--theme {
+  grid-column: 9 / 13;
+  grid-row: 2 / 3;
+  justify-content: space-between;
+}
+
+.card--state {
+  grid-column: 9 / 13;
+  grid-row: 3 / 4;
+  justify-content: space-between;
+}
+
+.card--palette {
+  grid-column: 1 / 5;
+  grid-row: 4 / 5;
+  justify-content: space-between;
+}
+
+.card--motion {
+  grid-column: 5 / 9;
+  grid-row: 4 / 5;
+  justify-content: space-between;
+}
+
+.card--calendar {
+  grid-column: 9 / 13;
+  grid-row: 4 / 7;
+}
+
+.card--type {
+  grid-column: 1 / 5;
+  grid-row: 5 / 7;
+}
+
+.card--contact {
+  grid-column: 5 / 9;
+  grid-row: 5 / 7;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.5rem 1rem;
+  background: #101013;
+  color: #f5f4f1;
+}
+
+body[data-ds-dark-theme] .card--contact {
+  background: #f3f2ee;
+  color: #111114;
+}
+
+.card--dials {
+  grid-column: 1 / 13;
+  grid-row: 7 / 8;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.1rem, 3vw, 2.75rem);
+  align-items: start;
+}
+
+/* --- segmented control ---------------------------------------------------- */
+
 .seg {
   display: inline-flex;
+  inline-size: fit-content;
+  align-self: flex-start;
   gap: 2px;
   padding: 3px;
   border-radius: 12px;
@@ -1086,7 +1332,7 @@ body[data-ds-dark-theme] {
 .seg__btn {
   display: grid;
   place-items: center;
-  inline-size: 2.4rem;
+  inline-size: 2.5rem;
   block-size: 2rem;
   padding: 0;
   border: 0;
@@ -1095,9 +1341,9 @@ body[data-ds-dark-theme] {
   color: var(--dsw-alias-label-tertiary);
   cursor: pointer;
   transition:
-    background var(--dur) var(--ease),
-    color var(--dur) var(--ease),
-    box-shadow var(--dur) var(--ease);
+    background 0.2s var(--ease),
+    color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
 }
 
 .seg__btn svg {
@@ -1106,38 +1352,53 @@ body[data-ds-dark-theme] {
 }
 
 .seg__btn:hover {
-  color: var(--dsw-alias-label-secondary);
+  color: var(--dsw-alias-label-primary);
 }
 
 .seg__btn[aria-pressed='true'] {
   background: var(--card-bg);
   color: var(--dsw-alias-label-primary);
-  box-shadow: 0 1px 2px rgba(15, 16, 20, 0.16);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
 }
 
-/* Palette: swatches are buttons that copy the computed colour. */
+.seg__btn:focus-visible,
+.swatch:focus-visible,
+.cal__btn:focus-visible {
+  outline: 2px solid var(--dsw-alias-label-primary);
+  outline-offset: 2px;
+}
+
+/* --- palette -------------------------------------------------------------- */
+
 .swatches {
-  display: flex;
-  gap: 0.6rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem 0.4rem;
+  margin-block-start: auto;
 }
 
 .swatch {
   display: grid;
-  gap: 0.35rem;
   justify-items: center;
+  gap: 0.3rem;
   padding: 0;
   border: 0;
   background: none;
+  color: inherit;
+  font: inherit;
   cursor: pointer;
 }
 
 .swatch__chip {
-  inline-size: 2.4rem;
-  block-size: 2.4rem;
-  border-radius: 11px;
+  inline-size: 100%;
+  max-inline-size: 2.1rem;
+  aspect-ratio: 1;
+  border-radius: 9px;
   background: var(--swatch);
-  box-shadow: inset 0 0 0 1px rgba(15, 16, 20, 0.08);
-  transition: transform var(--dur) var(--ease);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--dsw-alias-label-primary) 18%, transparent),
+    0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: transform 0.25s var(--ease);
 }
 
 .swatch:hover .swatch__chip {
@@ -1149,14 +1410,33 @@ body[data-ds-dark-theme] {
   color: var(--card-meta);
 }
 
-/* Render state: live numbers, aligned like a readout. */
-.stats {
-  display: grid;
-  gap: 0.45rem;
-  margin: 0;
+/* --- render state --------------------------------------------------------- */
+
+.spark {
+  inline-size: 100%;
+  block-size: 2.1rem;
+  margin-block-start: 0.2rem;
+  color: var(--dsw-alias-label-primary);
+  opacity: 0.6;
+  overflow: visible;
 }
 
-.stats__row {
+.spark polyline {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.stats {
+  display: grid;
+  gap: 0.3rem;
+  margin: auto 0 0;
+}
+
+.stats > div {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -1164,223 +1444,624 @@ body[data-ds-dark-theme] {
 }
 
 .stats dt {
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   color: var(--card-meta);
 }
 
 .stats dd {
   margin: 0;
-  font-size: 0.9375rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
 }
 
-/* The one high-contrast surface, the way a board anchors itself on black. */
-.card--contact {
-  grid-column: span 8;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  background: #101013;
-  color: #f4f4f1;
-  text-decoration: none;
-}
+/* --- switch --------------------------------------------------------------- */
 
-body[data-ds-dark-theme] .card--contact {
-  background: #f2f2ef;
-  color: #101013;
-}
-
-.card--contact .contact__text {
-  font-size: clamp(1.5rem, 2.2vw, 2rem);
-  font-weight: 600;
-  letter-spacing: -0.035em;
-}
-
-.card--contact .contact__arrow {
-  font-size: 1.35rem;
-  transition: translate var(--dur) var(--ease);
-}
-
-.card--contact:hover .contact__arrow {
-  translate: 3px -3px;
-}
-
-/* Controls float on the painting: a small white instrument cluster. */
-.stage__controls {
-  position: absolute;
-  inset-block-end: 1rem;
-  inset-inline-start: 1rem;
-  z-index: 4;
+.switch {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.65rem;
+  margin-block-start: auto;
+  cursor: pointer;
 }
 
-.board .icon-toggle {
-  inline-size: 2.5rem;
-  block-size: 2.5rem;
-  border: 0;
-  background: var(--card-bg);
-  box-shadow: var(--card-shadow);
-  color: var(--dsw-alias-label-primary);
-  opacity: 1;
+.switch__input {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
-.dial {
+.switch__track {
+  position: relative;
+  flex: none;
+  pointer-events: none;
+  inline-size: 2.6rem;
+  block-size: 1.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary) 16%, transparent);
+  transition: background 0.25s var(--ease);
+}
+
+.switch__thumb {
+  position: absolute;
+  pointer-events: none;
+  inset-block-start: 0.18rem;
+  inset-inline-start: 0.18rem;
+  inline-size: 1.19rem;
+  block-size: 1.19rem;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+  transition: translate 0.28s var(--ease);
+}
+
+.switch__input:checked + .switch__track {
+  background: var(--dsw-alias-label-primary);
+}
+
+.switch__input:checked + .switch__track .switch__thumb {
+  translate: 1.05rem 0;
+}
+
+.switch__input:focus-visible + .switch__track {
+  outline: 2px solid var(--dsw-alias-label-primary);
+  outline-offset: 3px;
+}
+
+.switch__text {
+  font-size: 0.75rem;
+  color: var(--card-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- calendar ------------------------------------------------------------- */
+
+.cal {
+  display: grid;
+  gap: 0.35rem;
+  margin-block-start: auto;
+}
+
+.cal__nav {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.cal__btn {
   display: grid;
   place-items: center;
-  inline-size: 7.5rem;
-  block-size: 2.5rem;
-  padding-inline: 0.9rem;
-  border-radius: 999px;
-  background: var(--card-bg);
-  box-shadow: var(--card-shadow);
-  cursor: pointer;
-}
-
-.dial__track {
-  display: none;
-}
-
-.dial__input {
-  -webkit-appearance: none;
-  appearance: none;
-  inline-size: 100%;
-  block-size: 2.5rem;
-  margin: 0;
-  background: transparent;
-  cursor: pointer;
-}
-
-.dial__input::-webkit-slider-runnable-track {
-  block-size: 3px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--dsw-alias-label-primary) 18%, transparent);
-}
-
-.dial__input::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  inline-size: 13px;
-  block-size: 13px;
-  margin-block-start: -5px;
+  inline-size: 1.55rem;
+  block-size: 1.55rem;
+  padding: 0;
   border: 0;
-  border-radius: 50%;
-  background: var(--dsw-alias-label-primary);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary) 6%, transparent);
+  color: var(--dsw-alias-label-secondary);
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.2s var(--ease),
+    color 0.2s var(--ease);
 }
 
-.dial__input::-moz-range-track {
-  block-size: 3px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--dsw-alias-label-primary) 18%, transparent);
+.cal__btn:hover {
+  background: color-mix(in srgb, var(--dsw-alias-label-primary) 13%, transparent);
+  color: var(--dsw-alias-label-primary);
 }
 
-.dial__input::-moz-range-thumb {
-  inline-size: 13px;
-  block-size: 13px;
-  border: 0;
-  border-radius: 50%;
-  background: var(--dsw-alias-label-primary);
+.cal__week,
+.cal__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.1rem;
 }
 
-/* The board folds into one column on small screens, art first. */
-@media (max-width: 1024px) {
-  .board .stage {
-    grid-column: span 12;
-    grid-row: span 1;
-    min-block-size: 22rem;
-    order: -1;
-  }
-
-  .card {
-    grid-column: span 6;
-  }
-
-  .card--contact {
-    grid-column: span 12;
-  }
-}
-
-@media (max-width: 640px) {
-  .board {
-    grid-auto-rows: auto;
-  }
-
-  .board .stage {
-    min-block-size: 17rem;
-  }
-
-  .card {
-    grid-column: span 12;
-  }
-
-  .card--clock {
-    min-block-size: 9rem;
-  }
-}
-
-
-/* Slider cards: a label, a live value, and a track that reads as one line. */
-.card__row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.card__label {
-  font-size: 0.8125rem;
+.cal__week span {
+  font-size: 0.625rem;
+  text-align: center;
   color: var(--card-meta);
 }
 
-.card__value {
-  font-size: 0.8125rem;
+.cal__grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cal__day {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  font-size: 0.75rem;
   font-variant-numeric: tabular-nums;
   color: var(--dsw-alias-label-secondary);
 }
 
-.card--slider {
-  gap: 1.1rem;
+.cal__day[data-outside] {
+  color: color-mix(in srgb, var(--dsw-alias-label-primary) 62%, transparent);
+}
+
+.cal__day[aria-current='date'] {
+  background: var(--dsw-alias-label-primary);
+  color: var(--card-bg);
+  font-weight: 600;
+}
+
+/* --- type specimen -------------------------------------------------------- */
+
+.specimen {
+  margin: auto 0 0;
+  font-size: clamp(4.5rem, 7.5vw, 7rem);
+  font-weight: 600;
+  line-height: 0.78;
+  letter-spacing: -0.07em;
+}
+
+.scale {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.7rem 0 0;
+  border-block-start: 1px solid var(--card-hair);
+  list-style: none;
+}
+
+.scale li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.scale__sample {
+  line-height: 1;
+}
+
+.scale__label {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--card-meta);
+}
+
+/* --- dials ---------------------------------------------------------------- */
+
+.dial-row {
+  display: grid;
+  gap: 0.5rem;
+  min-inline-size: 0;
+}
+
+.dial-row .card__head {
+  gap: 0.75rem;
 }
 
 .slider {
-  -webkit-appearance: none;
+  --slider-fill: 50%;
   appearance: none;
-  align-self: stretch;
+  -webkit-appearance: none;
   inline-size: 100%;
-  block-size: 1.5rem;
+  block-size: 1.25rem;
   margin: 0;
+  padding: 0;
+  border: 0;
   background: transparent;
   cursor: pointer;
 }
 
 .slider::-webkit-slider-runnable-track {
-  block-size: 3px;
+  block-size: 0.2rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--dsw-alias-label-primary) 18%, transparent);
+  background: linear-gradient(
+    to right,
+    var(--dsw-alias-label-primary) var(--slider-fill),
+    color-mix(in srgb, var(--dsw-alias-label-primary) 14%, transparent) var(--slider-fill)
+  );
 }
 
 .slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  inline-size: 14px;
-  block-size: 14px;
-  margin-block-start: -5.5px;
+  inline-size: 1rem;
+  block-size: 1rem;
+  margin-block-start: -0.4rem;
   border: 0;
   border-radius: 50%;
-  background: var(--dsw-alias-label-primary);
+  background: var(--card-bg);
+  box-shadow:
+    0 0 0 1.5px var(--dsw-alias-label-primary),
+    0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .slider::-moz-range-track {
-  block-size: 3px;
+  block-size: 0.2rem;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--dsw-alias-label-primary) 18%, transparent);
+  background: color-mix(in srgb, var(--dsw-alias-label-primary) 14%, transparent);
+}
+
+.slider::-moz-range-progress {
+  block-size: 0.2rem;
+  border-radius: 999px;
+  background: var(--dsw-alias-label-primary);
 }
 
 .slider::-moz-range-thumb {
-  inline-size: 14px;
-  block-size: 14px;
+  inline-size: 1rem;
+  block-size: 1rem;
   border: 0;
   border-radius: 50%;
-  background: var(--dsw-alias-label-primary);
+  background: var(--card-bg);
+  box-shadow:
+    0 0 0 1.5px var(--dsw-alias-label-primary),
+    0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.slider:focus-visible {
+  outline: 2px solid var(--dsw-alias-label-primary);
+  outline-offset: 4px;
+}
+
+/* --- contact -------------------------------------------------------------- */
+
+.contact__text {
+  font-size: clamp(2.4rem, 4.6vw, 3.6rem);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+
+.card--contact .card__head {
+  grid-column: 1 / -1;
+}
+
+/* The contact card inverts: its own labels must invert with it. */
+.card--contact .card__label,
+.card--contact .card__flag {
+  color: color-mix(in srgb, currentColor 62%, transparent);
+}
+
+.contact__text {
+  align-self: center;
+}
+
+.contact__arrow {
+  align-self: center;
+  font-size: 2rem;
+  opacity: 0.9;
+  transition: translate 0.3s var(--ease);
+}
+
+.card--contact:hover .contact__arrow {
+  translate: 4px -4px;
+}
+
+.card--contact:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* --- prints: opening a plate ---------------------------------------------- */
+
+.plate__open {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.plate__open:focus-visible {
+  outline: 2px solid var(--dsw-alias-label-primary);
+  outline-offset: 6px;
+}
+
+.plate__hover {
+  position: absolute;
+  inset-block-end: 0.7rem;
+  inset-inline-end: 0.8rem;
+  z-index: 4;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--card-bg) 76%, transparent);
+  backdrop-filter: blur(8px);
+  color: var(--dsw-alias-label-primary);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  opacity: 0;
+  translate: 0 4px;
+  transition:
+    opacity 0.25s var(--ease),
+    translate 0.25s var(--ease);
+}
+
+.plate__open:hover .plate__hover,
+.plate__open:focus-visible .plate__hover {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.plate__info {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding-block-start: 0.7rem;
+  font-size: 0.72rem;
+  color: var(--card-meta);
+}
+
+.plate__index {
+  font-family: var(--font-mono);
+  color: var(--dsw-alias-label-primary);
+  opacity: 0.6;
+}
+
+.plate__meta {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plate__ratio {
+  font-family: var(--font-mono);
+  color: var(--card-meta);
+}
+
+/* --- viewer dialog -------------------------------------------------------- */
+
+.viewer {
+  inline-size: min(92vw, 1060px);
+  max-inline-size: none;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: var(--card-bg);
+  color: var(--dsw-alias-label-primary);
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.viewer:not([open]) {
+  display: none;
+}
+
+.viewer::backdrop {
+  background: color-mix(in srgb, #0b0b0d 42%, transparent);
+  backdrop-filter: blur(10px);
+}
+
+dialog:modal {
+  overscroll-behavior: contain;
+}
+
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.viewer__frame {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: var(--board-canvas);
+}
+
+.viewer__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent),
+    linear-gradient(to bottom, transparent, #000 6%, #000 94%, transparent);
+  mask-composite: intersect;
+}
+
+.viewer__frame.is-live .viewer__canvas {
+  opacity: 1;
+}
+
+.viewer__bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+}
+
+.viewer__title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.viewer__meta {
+  flex: 1;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--card-meta);
+}
+
+.viewer__close {
+  display: grid;
+  place-items: center;
+  inline-size: 2.1rem;
+  block-size: 2.1rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary) 7%, transparent);
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+  transition: background 0.2s var(--ease);
+}
+
+.viewer__close:hover {
+  background: color-mix(in srgb, var(--dsw-alias-label-primary) 14%, transparent);
+}
+
+.viewer__close:focus-visible {
+  outline: 2px solid var(--dsw-alias-label-primary);
+  outline-offset: 2px;
+}
+
+/* --- entrance ------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .board > .card,
+  .board > .stage {
+    animation: board-in 0.65s var(--ease) both;
+  }
+
+  .board > :nth-child(2) {
+    animation-delay: 40ms;
+  }
+
+  .board > :nth-child(3) {
+    animation-delay: 80ms;
+  }
+
+  .board > :nth-child(4) {
+    animation-delay: 120ms;
+  }
+
+  .board > :nth-child(5) {
+    animation-delay: 150ms;
+  }
+
+  .board > :nth-child(6) {
+    animation-delay: 180ms;
+  }
+
+  .board > :nth-child(7) {
+    animation-delay: 210ms;
+  }
+
+  .board > :nth-child(8) {
+    animation-delay: 240ms;
+  }
+
+  @keyframes board-in {
+    from {
+      opacity: 0;
+      translate: 0 12px;
+    }
+  }
+}
+
+/* --- responsive board ----------------------------------------------------- */
+
+@media (max-width: 1080px) {
+  .board {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .board .stage {
+    grid-column: 1 / 7;
+    grid-row: auto;
+    min-block-size: 26rem;
+  }
+
+  .card--clock,
+  .card--theme,
+  .card--state {
+    grid-column: span 2;
+    grid-row: auto;
+  }
+
+  .card--palette,
+  .card--motion,
+  .card--calendar,
+  .card--type {
+    grid-column: span 3;
+    grid-row: auto;
+  }
+
+  .card--calendar {
+    min-block-size: 22rem;
+  }
+
+  .card--contact {
+    grid-column: 1 / 7;
+    grid-row: auto;
+    min-block-size: 13rem;
+  }
+
+  .card--dials {
+    grid-column: 1 / 7;
+    grid-row: auto;
+  }
+}
+
+@media (max-width: 680px) {
+  .board {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: auto;
+  }
+
+  .board .stage {
+    grid-column: 1 / -1;
+    min-block-size: 21rem;
+  }
+
+  .card {
+    grid-row: auto;
+  }
+
+  .card--clock,
+  .card--theme,
+  .card--state,
+  .card--palette {
+    grid-column: span 1;
+    min-block-size: 9.5rem;
+  }
+
+  .card--motion {
+    grid-column: 1 / -1;
+    min-block-size: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card--motion .switch {
+    margin-block-start: 0;
+  }
+
+  .card--calendar,
+  .card--contact,
+  .card--type,
+  .card--dials {
+    grid-column: 1 / -1;
+  }
+
+  .card--calendar {
+    min-block-size: 21rem;
+  }
+
+  .card--contact {
+    min-block-size: 11rem;
+  }
+
+  .card--dials {
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+  }
+
+  .card--type {
+    min-block-size: 17rem;
+  }
+
+  .swatches {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
