@@ -51,7 +51,7 @@
      before the canvas has measured anything, so the art never pops in from
      blank paper. Regenerate with tools/make-field-webp.py. */
   /* @echo light */
-  --field-echo: url("data:image/webp;base64,UklGRh4CAABXRUJQVlA4WAoAAAAQAAAAGwAAEQAAQUxQSEkBAAABkGPbtmlbY67jZ9u27Rfh27Zt27bt1NErwK/Zcw0iYgKYS0kmSbMgiRnKTJogAYk5uRU5GTkJoWO4TC4JgtKtR1ZevHP+2NHdG9ZcPHju/Mmx2pzIgMKRy2+fbw6SXc/H91Nr6qqb1y7ce/P8xobSTbefPp9Xk8yMnapDX8b//9zXKpAkJGTmuOA1nPl+d9XI9hNXjnQkAUhIBiQP3Pr94XQZEFWObDiIyeQYkNi55em3J2urXMwcgEBmAKFTd/HH+O0lMYAAmQnAictZfuDiv6cHegMwCSQByimvm3/64dvnVxeUh2BiosSE8/fePbt6cjgvAiQkMzOZAF6eXD8v3nPBcc2YrqMgtYDpO+nptX2dw6sP7z2xYefKnML8vLSioa7anoVLdq/YcWzLwS3dbU0txcmJHqf2HD22+sCJzZ3zO5pqs1KZPgBWUDggrgAAAFAFAJ0BKhwAEgA/AXauUKsnpCOwGAgBYCAJbADKEfql3OsHDDq/phNwC6qX7bglcZ4qAAD+5CjDsT+zTdCIXoebKd77NiGcA6OBKswgfeXM0ZbPVHCqamxi8KrJlP/MEi27E1fSABg8fYlRkhS90u10fxf+MYVT6Ia/Z3Lufpd8N3zU+Xnu6g31LJjqrGxtDFBq2n7mmflf6F5oUWXSZlJxnkkOqm3obNU22/9AAA==");
+  --field-echo: url("data:image/webp;base64,UklGRuQBAABXRUJQVlA4WAoAAAAQAAAAGwAADwAAQUxQSP0AAAABgB3Ztmlrzr0Prm3btq1nv/f58o/jOoOImADclccgSZAXkSCuJkmQBAzO+cQTCZoT0YDPFghpAucTjfYonbBkw2o463DFg117OBn2ey10TffvL00HrtRNnoCl9vvQjSsASCFIClBQAJDZ4d+6nM7VglaHoCSOCUB6mg/beVYB1EAh3yIJkATgqqyagxAAkDimII5leN8ZRlUApABAQQKQwpV5WE4aBg0gAfAIQGKeaD6sH4Z2Ay4VpBSC/5/1TVKzAODxqbMRQOJiUjVrToc7Ve/6IYViMls1u8/jcDXXo4faYyOUdPvj6bS1VU22u82sqzEKmkxWm65JBecBAFZQOCDAAAAAsAQAnQEqHAAQAD8BbK1PKyYkIjAIAWAgCWxMG2H0EaIGAG8lkRIP5f3OXkf8AAD+7H24Wuv/6vtvH7CtjI1o1WJdoq7q4oMljY2PGfKYbjiHdALoSDArVO1maNqkuyulefOrtldUotvDBIz8n3SrqLGvk/jjMUKsksdho8BUP+pvFqIUC2lNNwP6rEMIpw3NM1uv7x3sJKsYqS7ZD2+lN3/+P4Beq5Zy/uHDLb3dVl/L5kHx4YZ6bDXLGWcsYAAA");
 }
 
 /* --- reset & document canvas --------------------------------------------- */
@@ -163,7 +163,7 @@ body[data-ds-dark-theme] {
     url('/hero-field-dark.webp') type('image/webp')
   );
   /* @echo dark */
-  --field-echo: url("data:image/webp;base64,UklGRjICAABXRUJQVlA4WAoAAAAQAAAAGwAAEQAAQUxQSEoBAAABkGPbtmlbY67jZ9u2rW/btm3btu3U2ct/yZ5rEBETwERKMkkaotFJYowyk4ZIQGJOXkVORk5C6Bguw0uCoGzrkZUX754/dnT3hjUXD547f3JObU5kQOHsK2+fbw6SXc/H91Nr6qpb1i7cc/P8xoayTbefPp9bk8yYnapDXwb//9zXKpAkJGTmuOA1nPl+d9Ws7SeuHOlMApCQDEgZuPXn4+kyIKqcveEgJpNjQGLnlqffnq6pcjFzAAKZAYRO3cUfg7cXxwICZCYAJy5n+YGL/54d6AvAJJAEKKe8fv7ph2+fX11QEYKJoRJDLtx79+zqyal5MYCEZGYmE8Crk+vnxXsuOK4Zo3UUpBYweic9va6va8rqw3tPbNixMrcwPy+taEpXbc+CJbtX7Di65eCWnvamluLkRI9Te44eW73/xKbOeR1NtVmpjB5WUDggwgAAABAEAJ0BKhwAEgA/AWqsTyslpCIwCAFgIAlsAILoHLCvA9kIEKZH38gAAP5kmtwOI9vqHnVFguJhbfibM0QwiqJGH/p7Ce9ylE/CJy3yEnFQntQXN0HnywN9/8XhU+ufcPyPdMN6GEOvJHhjp/2z8/LgfZKa9D/jHj6I2ywM1PvJ0ZRm440QNdBnfslsPTkxxmEXRArgD9hhV3c3FCcnVkPfMQI5IQd9aehvn5JwPjtTFUoemS2QaA6BPvSBnwZugAAA");
+  --field-echo: url("data:image/webp;base64,UklGRgoCAABXRUJQVlA4WAoAAAAQAAAAGwAADwAAQUxQSPsAAAABgB3ZtmlrznV4bdu2bTwbny//NPwyiIgJwL/yM/j1j0gQvyZJkARMz3rhj0ds6UQ46AzHdMH36U5vls/YizEtVnB709GBK5aNhYJ2ehfn+9uOG780bP6wvfV2MUirAEgRkgIKBYBSmLzv6/liK+JwCxXiMwEo/s7lcVVQAS1cLndJAiQBeOvbzjgKACQ+U4jPSuzUnyQ0AKQAoAgBKOLLX27mbVMHSAD8BCCzTncvd5dTl4mfCkUR4cdj65DR7QD4+atvE4CCH5OaTfe4/bnWIARFVKvNYbiCfre3s5tdNi87sYw/lMrlHL1Gtj/sFLztWcRqdbgMXVHxPQBWUDgg6AAAALAFAJ0BKhwAEAA/AWytTysmJCIwCAFgIAlsAJ0yhGALcKkBdgG8ZEQjpAH6zDEqGw8oCzg+AAD+sz9tSaqzcjmwTvIGLCUmIP7pfMZN/IqlJxkwptdLp05Hat7qvFELof6k/ORwWeR+gP15zM147LC5sFAAoJ1FIBV3pjDjZIuIcW8Z+oCX7hAj2Pg285d3z+y7pUpJitHNb8s07Rd7XsRlx7j7V6rrSOYGk9pzYjhT4jzFNSAvUvzQfaD6ATwxo1/P7peI1H/lXgzkYx5puDRXdu4sP+B9fzPeF13tSKlFHfLkbjyDAAA=");
 }
 
 .site-main,
@@ -242,8 +242,8 @@ body[data-ds-dark-theme] {
   transition: opacity 0.8s var(--ease);
   /* Let the currents dissolve into the paper instead of stopping at an edge. */
   mask-image:
-    linear-gradient(to right, transparent, #000 7%, #000 93%, transparent),
-    linear-gradient(to bottom, transparent, #000 8%, #000 86%, transparent);
+    linear-gradient(to right, transparent, #000 9%, #000 91%, transparent),
+    linear-gradient(to bottom, transparent, #000 12%, #000 84%, transparent);
   mask-composite: intersect;
 }
 
@@ -995,4 +995,392 @@ body[data-ds-dark-theme] .plate--4 {
   .contact {
     font-size: clamp(2rem, 12vw, 3.25rem);
   }
+}
+
+
+/* --- the board: the first screen as working surfaces ----------------------- */
+
+/* The page is a neutral board and every card is a real surface: no borders, one
+   large radius, one soft shadow. The artwork keeps its own rules and simply
+   occupies part of the board instead of being framed by it. */
+:root {
+  --board-canvas: #f2f2ef;
+  --card-bg: #ffffff;
+  --card-radius: 22px;
+  --card-meta: var(--dsw-alias-label-tertiary);
+  --card-shadow: 0 1px 2px rgba(18, 19, 24, 0.05), 0 12px 32px rgba(18, 19, 24, 0.05);
+  --canvas-light: #f2f2ef;
+  --canvas-dark: #0b0b0d;
+}
+
+body[data-ds-dark-theme] {
+  --card-bg: #17171a;
+  --card-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.board {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: minmax(9rem, auto);
+  gap: clamp(0.65rem, 1vw, 1rem);
+  max-inline-size: 1320px;
+  margin-inline: auto;
+  padding: calc(var(--site-header-h) + 0.75rem) var(--site-gutter)
+    clamp(1rem, 3vw, 2rem);
+}
+
+/* No surface, no radius, no frame: the painting is one block of the board. */
+.board .stage {
+  grid-column: span 8;
+  grid-row: span 3;
+  block-size: auto;
+  min-block-size: 26rem;
+  animation: none;
+}
+
+.card {
+  position: relative;
+  grid-column: span 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(1rem, 1.5vw, 1.35rem);
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  color: var(--dsw-alias-label-primary);
+}
+
+.card__figure {
+  margin: 0;
+  font-size: clamp(2.1rem, 2.7vw, 2.6rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+.card__meta {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--card-meta);
+}
+
+.card--theme,
+.card--palette {
+  align-items: flex-start;
+}
+
+/* Segmented control: one track, one raised thumb, no borders. */
+.seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary) 7%, transparent);
+}
+
+.seg__btn {
+  display: grid;
+  place-items: center;
+  inline-size: 2.4rem;
+  block-size: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--dsw-alias-label-tertiary);
+  cursor: pointer;
+  transition:
+    background var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+.seg__btn svg {
+  inline-size: 1rem;
+  block-size: 1rem;
+}
+
+.seg__btn:hover {
+  color: var(--dsw-alias-label-secondary);
+}
+
+.seg__btn[aria-pressed='true'] {
+  background: var(--card-bg);
+  color: var(--dsw-alias-label-primary);
+  box-shadow: 0 1px 2px rgba(15, 16, 20, 0.16);
+}
+
+/* Palette: swatches are buttons that copy the computed colour. */
+.swatches {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.swatch {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.swatch__chip {
+  inline-size: 2.4rem;
+  block-size: 2.4rem;
+  border-radius: 11px;
+  background: var(--swatch);
+  box-shadow: inset 0 0 0 1px rgba(15, 16, 20, 0.08);
+  transition: transform var(--dur) var(--ease);
+}
+
+.swatch:hover .swatch__chip {
+  transform: translateY(-2px);
+}
+
+.swatch__name {
+  font-size: 0.6875rem;
+  color: var(--card-meta);
+}
+
+/* Render state: live numbers, aligned like a readout. */
+.stats {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.stats__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.stats dt {
+  font-size: 0.8125rem;
+  color: var(--card-meta);
+}
+
+.stats dd {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The one high-contrast surface, the way a board anchors itself on black. */
+.card--contact {
+  grid-column: span 8;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  background: #101013;
+  color: #f4f4f1;
+  text-decoration: none;
+}
+
+body[data-ds-dark-theme] .card--contact {
+  background: #f2f2ef;
+  color: #101013;
+}
+
+.card--contact .contact__text {
+  font-size: clamp(1.5rem, 2.2vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+}
+
+.card--contact .contact__arrow {
+  font-size: 1.35rem;
+  transition: translate var(--dur) var(--ease);
+}
+
+.card--contact:hover .contact__arrow {
+  translate: 3px -3px;
+}
+
+/* Controls float on the painting: a small white instrument cluster. */
+.stage__controls {
+  position: absolute;
+  inset-block-end: 1rem;
+  inset-inline-start: 1rem;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.board .icon-toggle {
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  border: 0;
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  color: var(--dsw-alias-label-primary);
+  opacity: 1;
+}
+
+.dial {
+  display: grid;
+  place-items: center;
+  inline-size: 7.5rem;
+  block-size: 2.5rem;
+  padding-inline: 0.9rem;
+  border-radius: 999px;
+  background: var(--card-bg);
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+}
+
+.dial__track {
+  display: none;
+}
+
+.dial__input {
+  -webkit-appearance: none;
+  appearance: none;
+  inline-size: 100%;
+  block-size: 2.5rem;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dial__input::-webkit-slider-runnable-track {
+  block-size: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary) 18%, transparent);
+}
+
+.dial__input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  inline-size: 13px;
+  block-size: 13px;
+  margin-block-start: -5px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--dsw-alias-label-primary);
+}
+
+.dial__input::-moz-range-track {
+  block-size: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary) 18%, transparent);
+}
+
+.dial__input::-moz-range-thumb {
+  inline-size: 13px;
+  block-size: 13px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--dsw-alias-label-primary);
+}
+
+/* The board folds into one column on small screens, art first. */
+@media (max-width: 1024px) {
+  .board .stage {
+    grid-column: span 12;
+    grid-row: span 1;
+    min-block-size: 22rem;
+    order: -1;
+  }
+
+  .card {
+    grid-column: span 6;
+  }
+
+  .card--contact {
+    grid-column: span 12;
+  }
+}
+
+@media (max-width: 640px) {
+  .board {
+    grid-auto-rows: auto;
+  }
+
+  .board .stage {
+    min-block-size: 17rem;
+  }
+
+  .card {
+    grid-column: span 12;
+  }
+
+  .card--clock {
+    min-block-size: 9rem;
+  }
+}
+
+
+/* Slider cards: a label, a live value, and a track that reads as one line. */
+.card__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.card__label {
+  font-size: 0.8125rem;
+  color: var(--card-meta);
+}
+
+.card__value {
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.card--slider {
+  gap: 1.1rem;
+}
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  align-self: stretch;
+  inline-size: 100%;
+  block-size: 1.5rem;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-runnable-track {
+  block-size: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary) 18%, transparent);
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  inline-size: 14px;
+  block-size: 14px;
+  margin-block-start: -5.5px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--dsw-alias-label-primary);
+}
+
+.slider::-moz-range-track {
+  block-size: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary) 18%, transparent);
+}
+
+.slider::-moz-range-thumb {
+  inline-size: 14px;
+  block-size: 14px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--dsw-alias-label-primary);
 }

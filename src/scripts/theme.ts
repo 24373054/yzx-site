@@ -37,12 +37,19 @@ presentTheme(runtime)
 const buttons = Array.from(
   document.querySelectorAll<HTMLButtonElement>('[data-theme-set]'),
 )
+const note = document.querySelector<HTMLElement>('[data-theme-note]')
+const noteLabels: Record<string, string> = {
+  light: '浅色',
+  dark: '深色',
+  system: '跟随系统',
+}
 
 function sync(): void {
   const preference = runtime.getTheme().preference
   for (const button of buttons) {
     button.setAttribute('aria-pressed', String(button.dataset.themeSet === preference))
   }
+  if (note) note.textContent = noteLabels[preference] ?? ''
 }
 
 for (const button of buttons) {

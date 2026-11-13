@@ -18,6 +18,8 @@ export interface MountOptions {
   density?: number
   /** Changes the particle seed, so several frozen covers differ. */
   seed?: number
+  /** Called about twice a second with live numbers for the status card. */
+  onStats?: (stats: { fps: number; strokes: number }) => void
 }
 
 interface Palette {
@@ -130,7 +132,14 @@ const BANDS: Band[] = [
 
 const mountField = (host: HTMLElement, canvas: HTMLCanvasElement, options: MountOptions) => {
   const ctx = canvas.getContext('2d', { alpha: true })
-  if (!ctx) return () => {}
+  if (!ctx)
+    return {
+      dispose: () => {},
+      pause: () => {},
+      play: () => {},
+      setIntensity: () => {},
+      setSpeed: () => {},
+    }
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
   const finePointer = window.matchMedia('(pointer: fine)').matches
@@ -149,6 +158,10 @@ const mountField = (host: HTMLElement, canvas: HTMLCanvasElement, options: Mount
   let lastFrame = 0
   let time = 0
   let disposed = false
+  let intensity = 1
+  let speedScale = 1
+  let statFrames = 0
+  let statSince = performance.now()
 
   const frameMs = finePointer ? 16 : 33
   // Seeded prints share the system but not the composition.
@@ -297,10 +310,10 @@ const mountField = (host: HTMLElement, canvas: HTMLCanvasElement, options: Mount
       for (let pass = 0; pass < PASSES; pass += 1) {
         const path = paths[bucket * PASSES + pass]
         if (pass === 0) {
-          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${0.035 * palette.alpha})`
+          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${0.035 * palette.alpha * intensity})`
           ctx.lineWidth = baseWidth * 4.2
         } else {
-          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${0.26 * palette.alpha})`
+          ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${0.26 * palette.alpha * intensity})`
           ctx.lineWidth = baseWidth
         }
         ctx.lineCap = 'round'
@@ -314,7 +327,7 @@ const mountField = (host: HTMLElement, canvas: HTMLCanvasElement, options: Mount
       const x = ((mote.u * 1.2 + 0.02) % 1) * aspect * scale
       const y = (0.06 + mote.lane * 0.88 + 0.5) * scale
       const radius = 0.6 + mote.depth * 1.3
-      ctx.fillStyle = `rgba(${palette.tones[2][0]}, ${palette.tones[2][1]}, ${palette.tones[2][2]}, ${twinkle * 0.28 * palette.alpha})`
+      ctx.fillStyle = `rgba(${palette.tones[2][0]}, ${palette.tones[2][1]}, ${palette.tones[2][2]}, ${twinkle * 0.28 * palette.alpha * intensity})`
       ctx.beginPath()
       ctx.arc(x, y, radius, 0, Math.PI * 2)
       ctx.fill()
@@ -354,8 +367,18 @@ const mountField = (host: HTMLElement, canvas: HTMLCanvasElement, options: Mount
     if (now - lastFrame < frameMs) return
     const dt = clamp((now - lastFrame) / 1000, 0.008, 0.05)
     lastFrame = now
-    update(dt)
+    update(dt * speedScale)
     render()
+
+    if (options.onStats) {
+      statFrames += 1
+      const since = now - statSince
+      if (since > 500) {
+        options.onStats({ fps: Math.round((statFrames * 1000) / since), strokes: strokes.length })
+        statFrames = 0
+        statSince = now
+      }
+    }
   }
 
   const start = () => {
@@ -452,7 +475,7 @@ const mountField = (host: HTMLElement, canvas: HTMLCanvasElement, options: Mount
   }
   reducedMotion.addEventListener('change', onMotionChange)
 
-  return () => {
+  const dispose = () => {
     disposed = true
     stop()
     toggle?.removeEventListener('click', onToggle)
@@ -464,6 +487,18 @@ const mountField = (host: HTMLElement, canvas: HTMLCanvasElement, options: Mount
     themeObserver.disconnect()
     resizeObserver.disconnect()
     reducedMotion.removeEventListener('change', onMotionChange)
+  }
+
+  return {
+    dispose,
+    pause: () => setPaused(true),
+    play: () => setPaused(false),
+    setIntensity: (next: number) => {
+      intensity = clamp(next, 0.2, 1.8)
+    },
+    setSpeed: (next: number) => {
+      speedScale = clamp(next, 0.2, 2.5)
+    },
   }
 }
 

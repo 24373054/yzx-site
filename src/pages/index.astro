@@ -3,10 +3,10 @@ import Base from '../layouts/Base.astro'
 import { site } from '../config'
 
 /**
- * The shell of the site: a full-bleed generative surface, then two editorial
- * sections. There is no copy here — every section is a frame the real content
- * will be poured into (works, a way to reach me), designed so the shapes read
- * before a single word exists.
+ * The first screen is a board of working surfaces, not a brochure: the artwork,
+ * a live clock, the theme switch, the ink palette, the render state and a way to
+ * reach me. Nothing here invents copy — every card does something real, and the
+ * empty slots for works and words stay empty until there is something to say.
  */
 const plates = [
   { span: 1, density: 1.1 },
@@ -15,24 +15,149 @@ const plates = [
   { span: 4, density: 2.0 },
 ]
 
+const swatches = [
+  { name: '墨', tone: 'var(--field-tone-1)' },
+  { name: '靛', tone: 'var(--field-tone-2)' },
+  { name: '青', tone: 'var(--field-tone-3)' },
+  { name: '纸', tone: 'var(--dsw-alias-bg-base)' },
+]
+
+const themes = [
+  { value: 'light', label: '浅色' },
+  { value: 'dark', label: '深色' },
+  { value: 'system', label: '跟随系统' },
+]
 ---
 
 <Base>
   <h1 class="visually-hidden">{site.title}</h1>
   <div class="progress" aria-hidden="true"></div>
 
-  <!--
-    The whole first screen is one generative artwork, not a card: the strokes
-    fade out at every edge and the header floats on top of it. The layers below
-    exist so the art is never a blank rectangle for a moment — a blurred echo of
-    the same frame (a 1 KB data URI) paints instantly, the live canvas fades in
-    over it, and the sharp still only appears for reduced-motion visitors.
-  -->
-  <section class="stage" data-ascii-field aria-label="生成艺术：墨流">
-    <div class="stage__echo" aria-hidden="true"></div>
-    <div class="stage__still" aria-hidden="true"></div>
-    <canvas class="stage__canvas" aria-hidden="true"></canvas>
-  </section>
+  <div class="board">
+    <!--
+      The painting is not a card: it has no surface, no border, and its strokes
+      dissolve at every edge, so the board sits next to the ink instead of
+      framing it. The layers below exist so the art is never a blank rectangle
+      for a moment — a blurred echo paints instantly, the live canvas fades in
+      over it, and the sharp still only appears for reduced-motion visitors.
+    -->
+    <section class="stage" data-ascii-field aria-label="生成艺术：墨流">
+      <div class="stage__echo" aria-hidden="true"></div>
+      <div class="stage__still" aria-hidden="true"></div>
+      <canvas class="stage__canvas" aria-hidden="true"></canvas>
+
+      <div class="stage__controls">
+        <button class="icon-toggle" type="button" data-field-toggle aria-label="暂停动画">
+          <svg class="icon-toggle__icon icon-toggle__icon--pause" viewBox="0 0 16 16" aria-hidden="true">
+            <rect x="4.5" y="3" width="2.5" height="10" rx="1"></rect>
+            <rect x="9" y="3" width="2.5" height="10" rx="1"></rect>
+          </svg>
+          <svg class="icon-toggle__icon icon-toggle__icon--play" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M5 2.9a.9.9 0 0 1 1.36-.77l8 5.1a.9.9 0 0 1 0 1.54l-8 5.1A.9.9 0 0 1 5 13.1Z"></path>
+          </svg>
+        </button>
+
+        <label class="dial">
+          <span class="visually-hidden">墨色浓度</span>
+          <input class="dial__input" type="range" min="0.35" max="1.6" step="0.05" value="1" data-ink-intensity />
+          <span class="dial__track" aria-hidden="true"></span>
+        </label>
+      </div>
+    </section>
+
+    <section class="card card--clock" aria-label="本地时间">
+      <p class="card__figure clock__time" data-clock-time>00:00</p>
+      <p class="card__meta clock__date" data-clock-date>—</p>
+    </section>
+
+    <section class="card card--theme" aria-label="外观">
+      <div class="seg" role="group" aria-label="主题">
+        {
+          themes.map((theme) => (
+            <button
+              class="seg__btn"
+              type="button"
+              data-theme-set={theme.value}
+              aria-label={theme.label}
+              aria-pressed={theme.value === 'system'}
+            >
+              {theme.value === 'light' && (
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                  <circle cx="8" cy="8" r="3.1" fill="none" stroke="currentColor" stroke-width="1.3"></circle>
+                  <g stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+                    <path d="M8 1.3v1.8M8 12.9v1.8M1.3 8h1.8M12.9 8h1.8M3.3 3.3l1.3 1.3M11.4 11.4l1.3 1.3M12.7 3.3l-1.3 1.3M4.6 11.4l-1.3 1.3"></path>
+                  </g>
+                </svg>
+              )}
+              {theme.value === 'dark' && (
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M13.2 9.7A5.6 5.6 0 0 1 6.3 2.8a5.6 5.6 0 1 0 6.9 6.9Z" fill="currentColor"></path>
+                </svg>
+              )}
+              {theme.value === 'system' && (
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                  <circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.3"></circle>
+                  <path d="M8 2.8a5.2 5.2 0 0 1 0 10.4Z" fill="currentColor"></path>
+                </svg>
+              )}
+            </button>
+          ))
+        }
+      </div>
+      <p class="card__meta" data-theme-note>跟随系统</p>
+    </section>
+
+    <section class="card card--state" aria-label="渲染状态">
+      <dl class="stats">
+        <div class="stats__row"><dt>帧率</dt><dd data-stat="fps">—</dd></div>
+        <div class="stats__row"><dt>笔触</dt><dd data-stat="strokes">—</dd></div>
+        <div class="stats__row"><dt>强度</dt><dd data-stat="intensity">1.00</dd></div>
+      </dl>
+    </section>
+
+    <section class="card card--palette" aria-label="墨色">
+      <div class="swatches">
+        {
+          swatches.map((swatch) => (
+            <button class="swatch" type="button" data-copy-hex={swatch.tone} aria-label={`复制${swatch.name}色值`}>
+              <span class="swatch__chip" style={`--swatch: ${swatch.tone}`} aria-hidden="true"></span>
+              <span class="swatch__name" aria-hidden="true">{swatch.name}</span>
+            </button>
+          ))
+        }
+      </div>
+      <p class="card__meta" data-copy-note>点击复制色值</p>
+    </section>
+
+    <a class="card card--contact" href={site.socials[0].href} rel="me noopener" target="_blank" id="contact">
+      <span class="contact__text">GitHub</span>
+      <span class="contact__arrow" aria-hidden="true">↗</span>
+    </a>
+
+    <section class="card card--slider" aria-label="字号">
+      <div class="card__row">
+        <label class="card__label" for="type-scale">字号</label>
+        <output class="card__value" for="type-scale" data-type-value>100%</output>
+      </div>
+      <input class="slider" id="type-scale" type="range" min="0.9" max="1.15" step="0.01" value="1" data-type-scale />
+    </section>
+
+    <section class="card card--slider" aria-label="噪点">
+      <div class="card__row">
+        <label class="card__label" for="grain-scale">噪点</label>
+        <output class="card__value" for="grain-scale" data-grain-value>0.028</output>
+      </div>
+      <input class="slider" id="grain-scale" type="range" min="0" max="0.07" step="0.002" value="0.028" data-grain-scale />
+    </section>
+
+    <section class="card card--slider" aria-label="流速">
+      <div class="card__row">
+        <label class="card__label" for="speed-scale">流速</label>
+        <output class="card__value" for="speed-scale" data-speed-value>1.00×</output>
+      </div>
+      <input class="slider" id="speed-scale" type="range" min="0.4" max="1.6" step="0.05" value="1" data-speed-scale />
+    </section>
+  </div>
 
   <div class="page">
     <section class="sec" id="work" aria-labelledby="work-label">
@@ -60,35 +185,97 @@ const plates = [
         }
       </ul>
     </section>
-
-    <section class="sec" id="contact" aria-labelledby="contact-label">
-      <div class="sec__head">
-        <p class="sec__label" id="contact-label"><span class="sec__num">02</span>联系方式</p>
-      </div>
-      <a class="contact" href={site.socials[0].href} rel="me noopener" target="_blank">
-        <span class="contact__text">GitHub</span>
-        <span class="contact__arrow" aria-hidden="true">↗</span>
-      </a>
-    </section>
   </div>
 </Base>
 
 <script>
   import { mountAsciiField } from '../scripts/ascii-field'
 
+  const still = new URLSearchParams(location.search).has('still')
   const host = document.querySelector<HTMLElement>('[data-ascii-field]')
   const canvas = host?.querySelector<HTMLCanvasElement>('canvas')
-  const still = new URLSearchParams(location.search).has('still')
-  if (host && canvas) {
-    const mountHero = () =>
-      mountAsciiField(host, canvas, {
-        // Rendering the fallback still: paint exactly the frame the animation
-        // starts on, so the image swap is invisible.
-        frozen: still,
-      })
 
-    mountHero()
+  const pad = (value: number) => String(value).padStart(2, '0')
+
+  if (host && canvas) {
+    const field = mountAsciiField(host, canvas, {
+      frozen: still,
+      onStats: ({ fps, strokes }) => {
+        const fpsNode = document.querySelector<HTMLElement>('[data-stat="fps"]')
+        const strokesNode = document.querySelector<HTMLElement>('[data-stat="strokes"]')
+        if (fpsNode) fpsNode.textContent = String(fps)
+        if (strokesNode) strokesNode.textContent = String(strokes)
+      },
+    })
+
+    const speedScale = document.querySelector<HTMLInputElement>('[data-speed-scale]')
+    const speedValue = document.querySelector<HTMLOutputElement>('[data-speed-value]')
+    speedScale?.addEventListener('input', () => {
+      const value = Number(speedScale.value)
+      field.setSpeed(value)
+      if (speedValue) speedValue.textContent = `${value.toFixed(2)}×`
+    })
+
+    const dial = document.querySelector<HTMLInputElement>('[data-ink-intensity]')
+    const strength = document.querySelector<HTMLElement>('[data-stat="intensity"]')
+    dial?.addEventListener('input', () => {
+      const value = Number(dial.value)
+      field.setIntensity(value)
+      if (strength) strength.textContent = value.toFixed(2)
+    })
   }
+
+  // Type scale, grain and current speed: small tools, not decoration.
+  const typeScale = document.querySelector<HTMLInputElement>('[data-type-scale]')
+  const typeValue = document.querySelector<HTMLOutputElement>('[data-type-value]')
+  typeScale?.addEventListener('input', () => {
+    const value = Number(typeScale.value)
+    document.documentElement.style.fontSize = `${(16 * value).toFixed(2)}px`
+    if (typeValue) typeValue.textContent = `${Math.round(value * 100)}%`
+  })
+
+  const grainScale = document.querySelector<HTMLInputElement>('[data-grain-scale]')
+  const grainValue = document.querySelector<HTMLOutputElement>('[data-grain-value]')
+  grainScale?.addEventListener('input', () => {
+    const value = Number(grainScale.value)
+    document.documentElement.style.setProperty('--grain-opacity', String(value))
+    if (grainValue) grainValue.textContent = value.toFixed(3)
+  })
+
+  // The clock is a real card, so it shows the visitor's time, not a fake one.
+  const timeNode = document.querySelector<HTMLElement>('[data-clock-time]')
+  const dateNode = document.querySelector<HTMLElement>('[data-clock-date]')
+  const paintClock = () => {
+    const now = new Date()
+    if (timeNode) timeNode.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}`
+    if (dateNode)
+      dateNode.textContent = new Intl.DateTimeFormat('zh-CN', {
+        month: 'long',
+        day: 'numeric',
+        weekday: 'short',
+      }).format(now)
+  }
+  paintClock()
+  window.setInterval(paintClock, 15000)
+
+  // Clicking a swatch copies its computed colour: the palette is a real tool.
+  const copyNote = document.querySelector<HTMLElement>('[data-copy-note]')
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-hex]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const chip = button.querySelector<HTMLElement>('.swatch__chip')
+      if (!chip) return
+      const hex = getComputedStyle(chip).getPropertyValue('--swatch').trim()
+      try {
+        await navigator.clipboard.writeText(hex)
+        if (copyNote) copyNote.textContent = '已复制色值'
+      } catch {
+        if (copyNote) copyNote.textContent = '复制失败'
+      }
+      window.setTimeout(() => {
+        if (copyNote) copyNote.textContent = '点击复制色值'
+      }, 1400)
+    })
+  })
 
   // Work covers are single frozen frames of the same system: prints, not
   // screenshots. They sit below the fold, so mount each one only as it comes
